@@ -1,0 +1,27 @@
+{
+  "name": "is_virtualisierung",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThunderAnimal/is_virtualisierung.git"
+  },
+  "keywords": [
+    "maps",
+    "emergencies",
+    "poi"
+  ],
+  "author": "Martin Weber",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThunderAnimal/is_virtualisierung/issues"
+  },
+  "homepage": "https://github.com/ThunderAnimal/is_virtualisierung#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
