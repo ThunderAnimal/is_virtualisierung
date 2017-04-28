@@ -1,0 +1,14 @@
+$primary-color: #3f51b5 !default;
+$primary-color-light: false !default;
+$primary-color-dark: false !default;
+@if not $primary-color-light {
+  $primary-color-light: lighten($primary-color, 15%);
+}
+@if not $primary-color-dark {
+  $primary-color-dark: darken($primary-color, 15%);
+}
+$secondary-color: #ff1744 !default;
+$success-color: #4caf50 !default;
+$error-color: #f44336 !default;
+
+$link-color: #039be5 !default;
