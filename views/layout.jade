@@ -13,31 +13,26 @@ html
 		header
 			nav.nav-extended
 				.nav-wrapper
-					a.brand-logo(href='#') Logo       
+					a.brand-logo.center(href='#') IS Virtualisierung      
 					a.button-collapse(href='#', data-activates='mobile-demo')
 						i.material-icons menu
 
 					ul#nav-mobile.right.hide-on-med-and-down
-						li: a(href='sass.html') Sass      
-						li: a(href='badges.html') Components      
-						li: a(href='collapsible.html') JavaScript      
+						li: a(href='login.html') Anmelden  
 					ul#mobile-demo.side-nav
-						li: a(href='sass.html') Sass         
-						li: a(href='badges.html') Components        
-						li: a(href='collapsible.html') JavaScript    
+						li: a(href='login.html') Anmelden  
 				.nav-content
-					ul.tabs.tabs-transparent
-						li.tab: a.active(href='#test1') Test 1        
-						li.tab: a(href='#test2') Test 2         
-						li.tab: a(href='#test3') Test 3
+					ul.tabs.tabs-transparent.tabs-fixed-width
+						li.tab: a.active(href='#maps')
+							i.material-icons(style='float: left') location_on
+							span Karte
+						li.tab: a(href='#statistik')
+							i.material-icons(style='float: left') trending_down
+							span Statistik  
 
 		main
 			.row
-				.col.s3
-
-				.col.s9
-					.container
-						block content
+				block content
 
 		footer.page-footer
 			.container
@@ -63,3 +58,4 @@ html
 
 	script(type='text/javascript' src='https://code.jquery.com/jquery-2.1.1.min.js')
 	script(type='text/javascript' src='/js/materialize.min.js')
+	script(type='text/javascript' src='/js/main.js')

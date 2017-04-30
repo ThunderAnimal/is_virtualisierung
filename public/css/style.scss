@@ -11,7 +11,22 @@ main{
 	flex: 1 0 auto;
 }
 
+.progress{
+	background-color: $secondary-color-light;
+	
+	.indeterminate {
+    	background-color: $secondary-color-dark;
+	}
+}
+
+
+
 .page-footer,
 nav{
 	background-color: $primary-color;
+}
+
+.header{
+	color: $primary-color-light;
+    font-weight: 300;
 }

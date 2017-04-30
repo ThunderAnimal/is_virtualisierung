@@ -1,14 +1,23 @@
 extends layout
 
 block content
-	#test1.col.s12
-		h1= title
-		p Welcome to #{title}
-	
-	#test2.col.s12
-		h1 TEST 2
-		p WHey Wilkkomen beim TEST 4
-	
-	#test3.col.s12
-		h1 TEST 3
-		p Hey willkommen beim TEST 3
+	#maps.col.s12
+		.row
+			.col.s3
+				h3.header Filter
+				p Her könnten iNformationen und Filter angezeigt werden
+
+			.col.s9
+				h3.header Maps 
+				p Hier könnte die Karte angezeigt werden
+
+	#statistik.col.s12
+		.container
+			h3.header Statisitk
+			p Hier werden diverse Charts angezeigt. Lade Daten...
+
+			.progress
+				.indeterminate
+
+
+			

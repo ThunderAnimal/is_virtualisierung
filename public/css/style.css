@@ -6,8 +6,17 @@ body {
 main {
   flex: 1 0 auto; }
 
+.progress {
+  background-color: #ff97ab; }
+  .progress .indeterminate {
+    background-color: #ca0027; }
+
 .page-footer,
 nav {
   background-color: #3f51b5; }
+
+.header {
+  color: #7280ce;
+  font-weight: 300; }
 
 /*# sourceMappingURL=style.css.map */

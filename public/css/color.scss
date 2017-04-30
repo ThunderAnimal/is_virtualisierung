@@ -8,6 +8,14 @@ $primary-color-dark: false !default;
   $primary-color-dark: darken($primary-color, 15%);
 }
 $secondary-color: #ff1744 !default;
+$secondary-color-light: false !default;
+$secondary-color-dark: false !default;
+@if not $secondary-color-light {
+  $secondary-color-light: lighten($secondary-color, 25%);
+}
+@if not $secondary-color-dark {
+  $secondary-color-dark: darken($secondary-color, 15%);
+}
 $success-color: #4caf50 !default;
 $error-color: #f44336 !default;
 
