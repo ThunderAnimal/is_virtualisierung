@@ -1,0 +1,21 @@
+doctype html
+html
+	head
+		include layout_head
+		block stylesheets
+
+	body
+		header
+			include layout_header_navbar
+
+		main
+			.row
+				block content
+
+		footer
+			include layout_footer
+
+	script(type='text/javascript' src='https://code.jquery.com/jquery-2.1.1.min.js')
+	script(type='text/javascript' src='/js/materialize.min.js')
+	script(type='text/javascript' src='/js/main.js')
+	block javascript

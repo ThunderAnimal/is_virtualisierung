@@ -1,6 +1,23 @@
-extends layout
+extends template_simple
 
 block content
-  h1= message
-  h2= error.status
-  pre #{error.stack}
+	.container
+		.center
+			h2.header Upps, das lief etwas!
+			img(src='/img/sorry.gif')
+
+		.center
+			a.waves-effect.waves-light.btn-large(href="/") zur Startseite
+				i.material-icons.left home
+			
+
+	.container(stlye='margin-top: 20px')
+		ul.collapsible(data='accordion')
+			li
+				.collapsible-header Error Log
+					i.material-icons error
+				.collapsible-body
+					h3.header #{message}
+					h4.header #{error.status}
+					pre #{error.stack}
+		

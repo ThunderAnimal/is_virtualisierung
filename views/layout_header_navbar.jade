@@ -1,0 +1,18 @@
+nav.nav-extended
+	.nav-wrapper
+		a.brand-logo.center(href='#') IS Virtualisierung      
+		a.button-collapse(href='#', data-activates='mobile-demo')
+			i.material-icons menu
+
+		ul#nav-mobile.right.hide-on-med-and-down
+			li: a(href='login') Anmelden  
+		ul#mobile-demo.side-nav
+			li: a(href='login') Anmelden  
+	.nav-content
+		ul.tabs.tabs-transparent.tabs-fixed-width
+			li.tab: a.active(href='#maps')
+				i.material-icons(style='float: left') location_on
+				span Karte
+			li.tab: a(href='#statistik')
+				i.material-icons(style='float: left') trending_down
+				span Statistik  

@@ -6,7 +6,6 @@ body{
 	flex-direction: column;
 }
 	
-
 main{
 	flex: 1 0 auto;
 }
@@ -18,15 +17,43 @@ main{
     	background-color: $secondary-color-dark;
 	}
 }
+.btn, .btn-large, btn-floating{
+	background-color: $secondary-color;
+	&:hover{
+    	background-color: $secondary-color-light;
+	}
+	&:focus {
+    	background-color: $secondary-color-dark;
+	}
+}
 
-
-
-.page-footer,
 nav{
 	background-color: $primary-color;
 }
+
 
 .header{
 	color: $primary-color-light;
     font-weight: 300;
 }
+
+.page-footer {
+	background-color: $primary-color;
+	
+	#footer-links{
+		a{
+			&:hover{
+				color: $secondary-color !important;
+			}
+		}
+	}
+	.footer-copyright{
+		a{
+			&:hover{
+				color: $secondary-color !important;
+			}
+		}
+	}
+}
+
+
