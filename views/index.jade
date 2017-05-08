@@ -3,10 +3,46 @@ extends template_navbar
 block content
 	#maps.col.s12
 		.row
-			.col.s3
+			#filterContainer.col.s3
 				h3.header Filter
-				p Her könnten iNformationen und Filter angezeigt werden
+				form
+					p
+						input#filterPolizei(type="checkbox", checked="checked")
+						label(for='filterPolizei') Polizeieinsätze
+					p
+						input#filterFeuerwehr(type="checkbox", checked="checked")
+						label(for='filterFeuerwehr') Feuerwehreinsätze
+					p
+						input#filterArtikel(type="checkbox", checked="checked")
+						label(for='filterArtikel') Zeitungsartikel
+					p
+						input#filterDenkmal(type="checkbox", checked="checked")
+						label(for='filterDenkmal') Denkmäler
+				form(style="padding-top:20px")
+					p
+						input#filterLateest(type="checkbox")
+						label(for='filterLateest') nur neustes Meldungen Zeigen
 
+				h3.header Information
+				.card.horizontal					
+					.card-stacked
+						.card-content
+							p I am a very simple card. I am good at containing small bits of information.
+						.card-action
+							a(href='#') This is a link
+				.card.horizontal					
+					.card-stacked
+						.card-content
+							p I am a very simple card. I am good at containing small bits of information.
+						.card-action
+							a(href='#') This is a link
+				.card.horizontal					
+					.card-stacked
+						.card-content
+							p I am a very simple card. I am good at containing small bits of information.
+						.card-action
+							a(href='#') This is a link
+			
 			#mapContainer.col.s9
 				#googleMap Lade Karte
 

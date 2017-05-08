@@ -20,13 +20,23 @@ main{
     	background-color: $secondary-color-dark;
 	}
 }
-.btn, .btn-large, btn-floating{
+.btn, .btn-large, btn-floating,
+{
 	background-color: $secondary-color;
 	&:hover{
     	background-color: $secondary-color-light;
 	}
 	&:focus {
     	background-color: $secondary-color-dark;
+	}
+}
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating){
+	color: $secondary-color;
+	&:hover{
+    	color: $secondary-color-light;
+	}
+	&:focus {
+    	color: $secondary-color-dark;
 	}
 }
 
@@ -68,6 +78,9 @@ nav{
 	}
 	#mapContainer{
 		padding: 0;
+	}
+	#filterContainer{
+		overflow-y: auto;
 	}
 
 }

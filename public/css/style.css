@@ -20,6 +20,13 @@ main {
   .btn:focus, .btn-large:focus, btn-floating:focus {
     background-color: #f30053; }
 
+.card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating) {
+  color: #ff4081; }
+  .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):hover {
+    color: #ffc0d5; }
+  .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):focus {
+    color: #f30053; }
+
 nav {
   background-color: #3f51b5; }
 
@@ -41,5 +48,7 @@ nav {
     margin-bottom: 0; }
   #maps #mapContainer {
     padding: 0; }
+  #maps #filterContainer {
+    overflow-y: auto; }
 
 /*# sourceMappingURL=style.css.map */

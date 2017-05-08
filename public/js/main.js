@@ -2,14 +2,18 @@
  	
  	$(".button-collapse").sideNav();
 
-  $('ul.tabs').tabs({ 'swipeable': true , heightStyle: "fill" });
+  $('ul.tabs').tabs({ 'swipeable': true });
 
-  $('#googleMap').height($( window ).height() - 112);
+
   
   var script = document.createElement('script');
   script.type = 'text/javascript';
   script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&'+'callback=initialize';
   document.body.appendChild(script);
+
+  $('#googleMap').height($( window ).height() - 112);
+  $('#filterContainer').height($( window ).height() - 112);
+  $('.tabs-content').height($( window ).height() - 112);
 
 });
 
