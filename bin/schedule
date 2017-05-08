@@ -1,0 +1,38 @@
+/**
+ * Created by martin_w on 09.05.2017.
+ */
+var CronJob = require('cron').CronJob;
+var dataManager = require('../app/dataManager');
+
+
+var job = new CronJob({
+    cronTime: '* 00 02 * * *',
+    onTick: function() {
+        /*
+         * Runs every day
+         * at 02:00 AM.
+         */
+        console.log("---- Starte Verarbeitung");
+
+        dataManager.fillData(function(){
+            dataManager.detectAdress(function(){
+                dataManager.calcCoords(function(){
+                    console.log("Verarbeitung beendet!");
+                    console.log("Naechste Ausfuehrung: 02:00 AM");
+                });
+            });
+        });
+    },
+    start: false,
+    timeZone: 'Europe/Berlin'
+});
+
+
+console.log("#############  Schedule #############");
+console.log("- Daten holen");
+console.log("- Datenbank fuellen");
+console.log("- Adressen aus Text ermitteln");
+console.log("- Geocoding durchfuehren");
+console.log("");
+console.log("Ausfuehrung: 02:00 AM");
+job.start();
