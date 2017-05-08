@@ -8,6 +8,9 @@ body{
 	
 main{
 	flex: 1 0 auto;
+	.row{
+		margin-bottom:0;
+	}
 }
 
 .progress{
@@ -54,6 +57,19 @@ nav{
 			}
 		}
 	}
+}
+
+#maps{
+	min-height: calc(100vh - 112px);
+	padding-right: 0;
+
+	.row{
+		margin-bottom:0;
+	}
+	#mapContainer{
+		padding: 0;
+	}
+
 }
 
 

@@ -1,0 +1,45 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column; }
+
+main {
+  flex: 1 0 auto; }
+  main .row {
+    margin-bottom: 0; }
+
+.progress {
+  background-color: #ffc0d5; }
+  .progress .indeterminate {
+    background-color: #f30053; }
+
+.btn, .btn-large, btn-floating {
+  background-color: #ff4081; }
+  .btn:hover, .btn-large:hover, btn-floating:hover {
+    background-color: #ffc0d5; }
+  .btn:focus, .btn-large:focus, btn-floating:focus {
+    background-color: #f30053; }
+
+nav {
+  background-color: #3f51b5; }
+
+.header {
+  color: #7280ce;
+  font-weight: 300; }
+
+.page-footer {
+  background-color: #3f51b5; }
+  .page-footer #footer-links a:hover {
+    color: #ff4081 !important; }
+  .page-footer .footer-copyright a:hover {
+    color: #ff4081 !important; }
+
+#maps {
+  min-height: calc(100vh - 112px);
+  padding-right: 0; }
+  #maps .row {
+    margin-bottom: 0; }
+  #maps #mapContainer {
+    padding: 0; }
+
+/*# sourceMappingURL=style.css.map */
