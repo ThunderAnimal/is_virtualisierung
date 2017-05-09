@@ -1,29 +1,42 @@
 body {
   display: flex;
   min-height: 100vh;
-  flex-direction: column; }
+  flex-direction: column;
+  overflow-y: scroll; }
 
 main {
   flex: 1 0 auto; }
   main .row {
     margin-bottom: 0; }
 
+::-webkit-scrollbar {
+  width: 10px; }
+
+::-webkit-scrollbar-track {
+  background-color: #7280ce; }
+
+::-webkit-scrollbar-thumb {
+  background-color: #3f51b5; }
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #b4b4b4; }
+
 .progress {
-  background-color: #ffc0d5; }
+  background-color: #ffd9e6; }
   .progress .indeterminate {
     background-color: #f30053; }
 
-.btn, .btn-large, btn-floating {
+.btn, .btn-large, .btn-floating {
   background-color: #ff4081; }
-  .btn:hover, .btn-large:hover, btn-floating:hover {
-    background-color: #ffc0d5; }
-  .btn:focus, .btn-large:focus, btn-floating:focus {
+  .btn:hover, .btn-large:hover, .btn-floating:hover {
+    background-color: #ff8db3; }
+  .btn:focus, .btn-large:focus, .btn-floating:focus {
     background-color: #f30053; }
 
 .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating) {
   color: #ff4081; }
   .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):hover {
-    color: #ffc0d5; }
+    color: #ff8db3; }
   .card .card-action a:not(.btn):not(.btn-large):not(.btn-large):not(.btn-floating):focus {
     color: #f30053; }
 

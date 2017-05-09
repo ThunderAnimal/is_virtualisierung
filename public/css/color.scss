@@ -11,7 +11,7 @@ $secondary-color: #ff4081 !default;
 $secondary-color-light: false !default;
 $secondary-color-dark: false !default;
 @if not $secondary-color-light {
-  $secondary-color-light: lighten($secondary-color, 25%);
+  $secondary-color-light: lighten($secondary-color, 15%);
 }
 @if not $secondary-color-dark {
   $secondary-color-dark: darken($secondary-color, 15%);
