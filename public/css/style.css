@@ -13,13 +13,13 @@ main {
   width: 10px; }
 
 ::-webkit-scrollbar-track {
-  background-color: #7280ce; }
+  background-color: transparent; }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #3f51b5; }
+  background-color: #7280ce; }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #b4b4b4; }
+  background-color: #CCC; }
 
 .progress {
   background-color: #ffd9e6; }

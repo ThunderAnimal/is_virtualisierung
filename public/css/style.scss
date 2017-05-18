@@ -18,13 +18,13 @@ main{
 	width: 10px;
 }
 ::-webkit-scrollbar-track {
-	background-color: $primary-color-light;
+	background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: $primary-color;
+    background-color: $primary-color-light;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #b4b4b4;
+    background-color: #CCC;
 }
 
 .progress{
