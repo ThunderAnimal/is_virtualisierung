@@ -1,0 +1,21 @@
+/**
+ * Created by insanemac on 31/05/2017.
+ */
+var db = require("../app/moduls/databaseManager");
+
+db.tx(function (t) {
+    // creating a sequence of transaction queries:
+    var q0 = t.none('DROP TABLE Persons ');
+    var q1 = t.none('DROP TABLE Persons2 ');
+    var q2 = t.none('CREATE TABLE Persons (PersonID int,LastName varchar(255),FirstName varchar(255),Address varchar(255),City varchar(255))');
+    var q3 = t.none('CREATE TABLE Persons2 (PersonID int,LastName varchar(255),FirstName varchar(255),Address varchar(255),City varchar(255))');
+
+    // returning a promise that determines a successful transaction:
+    return t.batch([q0, q1, q2, q3]); // all of the queries are to be resolved;
+}).then(function (data) {
+    console.log("Datenbank erfolgreich initialisiert");
+    process.exit()
+}).catch(function (error) {
+    console.log(error); // printing the error;
+    process.exit()
+});
