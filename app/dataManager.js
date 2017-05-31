@@ -2,6 +2,7 @@
  * Created by martin_w on 09.05.2017.
  */
 var RestManager = require('./moduls/restApiManager');
+var EreignisManager = require('./moduls/EreignisManager');
 
 exports.fillData = function(callback){
     console.log("Fill Data:");
@@ -35,8 +36,9 @@ function fillDataArticles(callback){
             }
             console.log("get Articles Page: " + currentPage + "/" + pages);
             RestManager.getArticles(currentPage, function (dataList) {
-               //TODO save data in DB, dabei pruefen ob ID schon vorhanden
-
+                for(var i = 0; i < dataList.length; i++){
+                    EreignisManager.addEreignis(dataList[i]);
+                }
                 rekGetArticles(currentPage + 1);
             });
         };
@@ -53,8 +55,9 @@ function fillDateReports(callback){
 
            console.log("get Reports Page: " + currentPage + "/" + pages);
            RestManager.getReports(currentPage, function (dataList) {
-              //TODO  save data in DB, dabei pruefen ob ID schon vorhanden
-
+               for(var i = 0; i < dataList.length; i++){
+                   EreignisManager.addEreignis(dataList[i]);
+               }
                rekGetReports(currentPage + 1);
            });
        };

@@ -36,6 +36,7 @@
     "node-sass-middleware": "0.9.8",
     "pg-promise": "^5.8.1",
     "request-json": "^0.6.2",
-    "serve-favicon": "~2.4.2"
+    "serve-favicon": "~2.4.2",
+    "uuid": "^3.0.1"
   }
 }
