@@ -4,6 +4,6 @@
 var pgp = require("pg-promise")();
 var databaseConf = require("../../config/database");
 
-var databse = pgp(databaseConf.connectionURL);
+var database = pgp(databaseConf.connectionURL);
 
-module.exports = databse;
+module.exports = database;
