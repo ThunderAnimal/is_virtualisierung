@@ -41,13 +41,11 @@ exports.getArticlesPages = function(callback){
 };
 
 exports.getReportPages = function(callback){
-    callback(1);
-    //TODO uncomment if the API is available
-    // client.get('reports_pages/', function(err, res, body) {
-    //     if (!err && res.statusCode == 200) {
-    //         callback(body.pages);
-    //     }else{
-    //         console.error(err);
-    //     }
-    // });
+    client.get('reports_pages/', function(err, res, body) {
+         if (!err && res.statusCode == 200) {
+             callback(body.pages);
+         }else{
+             console.error(err);
+         }
+     });
 };

@@ -12,9 +12,9 @@ exports.addEreignis = function (ereignis) {
             if(!data.exists){
                 var id = uuid.v4();
                 ereignis.ownId = id;
-                db.none("INSERT INTO ereignis(id) VALUES ($1)", id).catch(dbHelper.onError);
-                db.none("INSERT INTO ereignis_content(id, typ, titel, description, bezirk, adresse, url, zeitpunkt, ereignisid) " +
-                        "VALUES(${id}, ${kategorie}, ${titel}, ${inhalt}, ${bezirk}, ${adresse}, ${url}, ${meldungszeitpunkt}, ${ownId})", ereignis)
+                db.none("INSERT INTO ereignis(id, typ) VALUES ($1, $2)", [id, ereignis.kategorie]).catch(dbHelper.onError);
+                db.none("INSERT INTO ereignis_content(id, titel, description, bezirk, adresse, url, zeitpunkt, ereignisid) " +
+                        "VALUES(${id}, ${titel}, ${inhalt}, ${bezirk}, ${adresse}, ${url}, ${meldungszeitpunkt}, ${ownId})", ereignis)
                     .then(function (data) {
 
                     }).catch(dbHelper.onError);
