@@ -27,24 +27,25 @@ fsGeo.readFile('geoCodingJSON.json','utf8', function read(err, data) {
 
 function processFileGeo()
 {
-	objGeo = JSON.parse(contentGeo);
+	//objGeo = JSON.parse(contentGeo);
 	//console.log(objGeo.geo[2].Straße);
 	//calcCoords();
-	for (i in objGeo)
+	/*for (i in objGeo)
 	{
 		var street=  JSON.stringify(objGeo[i].Straße);
 			street=street.split(':')[0];
 			street= street.replace('{',"");
 			street= street.replace(/\s/g,'');
 			street = street.substr(1, street.length-2);
-		//	console.log(street);
+			console.log(street);
 			/*street= street.replace('[','');
 			street= street.replace(']','');
 			street= street.split(",")	*/
 			//getCoords(street);
 			//console.log(street);
-			getCoords();
-	}
+			
+	//}
+	getCoords();
 };
 
 function processFilePois() {
@@ -73,26 +74,35 @@ function processFilePois() {
 
 function getCoords()
 {
+	objGeo = JSON.parse(contentGeo);
 	
-	
-	for (i in objGeo)
+	for (i in objPois)
 	{
-		var street=  JSON.stringify(objGeo[i].Straße);
-			street=street.split(':')[0];
-			street= street.replace('{',"");
-			street= street.replace(/\s/g,'');
-			street = street.substr(1, street.length-2);
+		var streetPoi=  JSON.stringify(objPois[i].adressen);
+			streetPoi=streetPoi.split(':')[0];
+			streetPoi= streetPoi.replace('{',"");
+			streetPoi= streetPoi.replace(/\s/g,'');
+			streetPoi = streetPoi.substr(1, streetPoi.length-2);
 			
-			/*street= street.replace('[','');
-			street= street.replace(']','');
-			street= street.split(",")	*/
-			//getCoords(street);
-			console.log(street);
 			
+			for (j in objGeo)
+				{
+					var street=  JSON.stringify(objGeo[j].Straße);
+					street=street.split(':')[0];
+					street= street.replace('{',"");
+					street= street.replace(/\s/g,'');
+					street = street.substr(1, street.length-2);
+						if (street.includes(streetPoi))
+							{
+							console.log("Street: "+ streetPoi+ " lat: "+JSON.stringify(objGeo[j].lat)+ " long: "+ JSON.stringify(objGeo[j].lon ));
+							}
+	
+				}
 	}
 	
+	//console.log(test);
 	
-	console.log(JSON.stringify(objPois[0].adressen));
+	
 	
 	
 	/*for (i in objPois)
