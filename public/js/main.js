@@ -29,6 +29,7 @@
       }
 	  
   function initialize() {
+     var infowindow = new google.maps.InfoWindow();
      var map = new google.maps.Map(document.getElementById('googleMap'), {
         center: {lat: 52.520008, lng: 13.404954},
         scrollwheel: true,
@@ -50,6 +51,21 @@
           map: map
         });
 		count ++;
+
+	
+		google.maps.event.addListener(marker, 'click', function(event){
+
+				    var lat = event.latLng.lat();
+					var lng = event.latLng.lng();
+                    var formStr =  "<div class='infowindow' style='color:blue'>Text Info <br /><br />Lat:  "+lat+" <br /><br /> Long:  "+lng+"</div>";
+					
+					var latLng = event.latLng;
+					 infowindow.setContent(formStr);
+						infowindow.setPosition(latLng);
+						// alert("Lat=" + lat + "; Lng=" + lng);
+						infowindow.open(map, this);
+						
+				  });
 		}
 
 
@@ -63,6 +79,20 @@
           map: map
         });
 		count ++;
+
+		google.maps.event.addListener(marker, 'click', function(event){
+
+				    var lat = event.latLng.lat();
+					var lng = event.latLng.lng();
+                    var formStr =  "<div class='infowindow' style='color:blue'>Text Info <br /><br />Lat:  "+lat+" <br /><br /> Long:  "+lng+"</div>";
+					
+					var latLng = event.latLng;
+					 infowindow.setContent(formStr);
+						infowindow.setPosition(latLng);
+						// alert("Lat=" + lat + "; Lng=" + lng);
+						infowindow.open(map, this);
+						
+				  });
 		}*/
 
       
@@ -74,3 +104,14 @@
 
 
 	   
+	   function userEvent(){
+	              google.maps.event.addListenerOnce(map, 'click', function(){
+
+				    var lat = event.latLng.lat();
+					var lng = event.latLng.lng();
+  
+					alert("Lat=" + lat + "; Lng=" + lng);
+				  });
+	   }
+
+	  
