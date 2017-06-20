@@ -38,10 +38,16 @@ function fillDataArticles(callback){
             }
             console.log("get Articles Page: " + currentPage + "/" + pages);
             RestManager.getArticles(currentPage, function (dataList) {
-                for(var i = 0; i < dataList.length; i++){
-                    EreignisManager.addEreignis(dataList[i]);
-                }
-                rekGetArticles(currentPage + 1);
+                var rekAddEriegnis = function (currentItem) {
+                    if (currentItem >= dataList.length){
+                        rekGetArticles(currentPage + 1);
+                        return;
+                    }
+                    EreignisManager.addEreignis(dataList[currentItem], function () {
+                        rekAddEriegnis(currentItem + 1);
+                    });
+                };
+                rekAddEriegnis(0);
             });
         };
         rekGetArticles(1);
@@ -58,10 +64,16 @@ function fillDateReports(callback){
 
            console.log("get Reports Page: " + currentPage + "/" + pages);
            RestManager.getReports(currentPage, function (dataList) {
-               for(var i = 0; i < dataList.length; i++){
-                   EreignisManager.addEreignis(dataList[i]);
-               }
-               rekGetReports(currentPage + 1);
+               var rekAddEriegnis = function (currentItem) {
+                   if (currentItem >= dataList.length){
+                       rekGetReports(currentPage + 1);
+                       return;
+                   }
+                   EreignisManager.addEreignis(dataList[currentItem], function () {
+                       rekAddEriegnis(currentItem + 1);
+                   });
+               };
+               rekAddEriegnis(0);
            });
        };
         rekGetReports(1);

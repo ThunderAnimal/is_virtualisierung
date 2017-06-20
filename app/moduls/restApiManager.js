@@ -4,6 +4,7 @@
 request = require('request-json');
 
 var confApi = require('../../config/restApi');
+//TODO Umstyellung auf API von Gruppe 3
 var clientContent = request.createClient(confApi.content.uri);
 var clientSummary = request.createClient(confApi.summary.uri);
 
