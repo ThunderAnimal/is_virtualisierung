@@ -3,6 +3,7 @@
  */
 var RestManager = require('./moduls/restApiManager');
 var EreignisManager = require('./moduls/EreignisManager');
+var PoIManager = require('./moduls/PoiManager');
 
 exports.fillData = function(callback){
     console.log("Fill Data:");
@@ -15,10 +16,15 @@ exports.fillData = function(callback){
     });
 };
 
-exports.detectAdress = function(callback){
-    //TODO Datenbank durchgehen und pruefen ob adresse gefuellt ist, wenn nicht dann adresse aus text ermitteln
-    console.log("Detect Adress");
+exports.deleteEmptyAdresse = function(callback){
+    //TODO Datenbank durchgehen und pruefen ob adresse gefuellt ist, wenn nicht dann adresse Ereignis loeschen
+    console.log("Delete Content Without Adress");
     callback();
+};
+
+exports.deletePoIWithoutName = function (callback) {
+    //TODO Datenbank durchgehen und pruefen ob name gefuellt, wenn nicht dann Poi loeschen
+    console.log("Delete PoI Without Name");
 };
 
 exports.calcCoords = function(callback){
@@ -28,6 +34,7 @@ exports.calcCoords = function(callback){
 };
 
 function fillDataArticles(callback){
+    console.log("Fill Articles:");
     RestManager.getArticlesPages(function(pages){
         var rekGetArticles = function (currentPage){
             if(currentPage > pages){
@@ -46,6 +53,7 @@ function fillDataArticles(callback){
     });
 }
 function fillDateReports(callback){
+    console.log("Fill Reports:");
     RestManager.getReportPages(function(pages){
        var rekGetReports = function(currentPage){
            if(currentPage > pages){
@@ -65,6 +73,15 @@ function fillDateReports(callback){
     });
 }
 function fillDataPoI(callback){
-    //TODO implement
-    callback();
+    PoIManager.existsData(function (exists) {
+        //Wird nur einmalig gefuellt, pruefen ob gefuellt wenn nicht fuellen
+        if(exists){
+            console.log("Denkmal Tabelle ist schon gefuellt!");
+            callback();
+        }
+        PoIManager.initData(function () {
+            console.log("Fill PoI:");
+            PoIManager.fillData(callback);
+        });
+    });
 }
