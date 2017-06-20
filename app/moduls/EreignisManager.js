@@ -74,7 +74,37 @@ function setUpCoords(eriegnisId, adresse) {
         if (coords){
             db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [coords.longitude, coords.latitude, eriegnisId]).catch(dbHelper.onError);
         }else{
-            console.log(adresse + " nicht gefunden");
+            //Wenn nicht gefunden dan ueber API von openStreetMaop danach suchen
+            if (arryAdrss[1]){
+                adresse = arryAdrss[0] + ',' + arryAdrss[1];
+            }else{
+                adresse = arryAdrss[0];
+            }
+            var adresseBerlin = adresse + " Berlin";
+
+            setTimeout(function () { //Timeout to reduce change of Ddos
+                RestApi.getGeoCoords(adresseBerlin, function (data){
+                    if (data.length == 0){
+                        setTimeout(function () {
+                            RestApi.getGeoCoords(adresse, function (data) {
+                                if (data.length == 0) {
+                                    console.log(adresse + " nicht gefunden");
+                                } else {
+                                    if (data[0].address.state != "Berlin"){
+                                        console.log(adresse + " nicht in Berlin gefunden");
+                                    }else{
+                                        db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [data[0].lon, data[0].lat, eriegnisId]).catch(dbHelper.onError);
+                                    }
+                                }
+                            });
+                        }, Math.floor(Math.random() * 300000) + 15000 );
+                    } else{
+                        db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [data[0].lon, data[0].lat, eriegnisId]).catch(dbHelper.onError);
+                    }
+                }, Math.floor(Math.random() * 300000) + 15000);
+            });
+
+
         }
     });
 }

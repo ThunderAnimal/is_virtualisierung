@@ -7,6 +7,7 @@ var confApi = require('../../config/restApi');
 //TODO Umstyellung auf API von Gruppe 3
 var clientContent = request.createClient(confApi.content.uri);
 var clientSummary = request.createClient(confApi.summary.uri);
+var clientGeoCoords = request.createClient(confApi.geoCoords.uri);
 
 exports.getArticles = function(page, callback){
     clientContent.get('articles?page=' + page, function(err, res, body) {
@@ -60,6 +61,17 @@ exports.getSumArticles = function (id, callback) {
 
 exports.getSumReports = function (id, callback) {
     clientSummary.get('reports?id=' + id,  function(err, res, body){
+        if (!err && res.statusCode == 200) {
+            callback(body);
+        } else {
+            console.error(err);
+        }
+    });
+};
+
+exports.getGeoCoords = function (adresse, callback) {
+    var query = encodeURI(adresse);
+    clientGeoCoords.get('?format=json&addressdetails=1&limit=1&q=' + query, function (err, res, body) {
         if (!err && res.statusCode == 200) {
             callback(body);
         } else {

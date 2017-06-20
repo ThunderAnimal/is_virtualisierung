@@ -7,6 +7,9 @@ module.exports = {
     },
     summary:{
         "uri": "http://cmts2.f4.htw-berlin.de:8000/"
-    }
+    },
+    geoCoords:{
+        "uri": "http://nominatim.openstreetmap.org/"
+    },
 
 };
