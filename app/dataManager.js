@@ -78,6 +78,7 @@ function fillDataPoI(callback){
         if(exists){
             console.log("Denkmal Tabelle ist schon gefuellt!");
             callback();
+            return;
         }
         PoIManager.initData(function () {
             console.log("Fill PoI:");
