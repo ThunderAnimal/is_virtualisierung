@@ -16,15 +16,10 @@ exports.fillData = function(callback){
     });
 };
 
-exports.deleteEmptyAdresse = function(callback){
-    //TODO Datenbank durchgehen und pruefen ob adresse gefuellt ist, wenn nicht dann adresse Ereignis loeschen
-    console.log("Delete Content Without Adress");
-    callback();
-};
-
 exports.deletePoIWithoutName = function (callback) {
-    //TODO Datenbank durchgehen und pruefen ob name gefuellt, wenn nicht dann Poi loeschen
+    //Datenbank durchgehen und pruefen ob name gefuellt, wenn nicht dann Poi loeschen
     console.log("Delete PoI Without Name");
+    PoIManager.deleteDataWithputName(callback);
 };
 
 exports.calcCoords = function(callback){

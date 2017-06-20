@@ -58,6 +58,16 @@ exports.existsData = function (callback) {
         }).catch(function(error){dbHelper.onError(error); callback(false)});
 };
 
+exports.deleteDataWithputName = function (callback) {
+    db.none("DELETE FROM denkmal WHERE name = ''")
+        .then(function () {
+            if (typeof callback == "function"){
+                callback();
+            }
+
+        }).catch(dbHelper.onError);
+};
+
 function getCoords(objGeo, objPois) {
     var all = new Array();
     var len = objPois.length;

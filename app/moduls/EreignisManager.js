@@ -8,7 +8,10 @@ var RestApi = require("../moduls/restApiManager");
 var uuid = require("uuid");
 
 exports.addEreignis = function (ereignis) {
-    var that = this;
+    //Ereignisse ohne Adresse nicht Aufnehmen
+    if (ereignis.adresse == ""){
+        return;
+    }
     db.oneOrNone("SELECT EXISTS(SELECT 1 FROM ereignis_content WHERE id=$1)", ereignis.id)
         .then(function (data) {
             if(!data.exists){

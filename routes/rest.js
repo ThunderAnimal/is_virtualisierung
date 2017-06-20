@@ -10,7 +10,11 @@ var dataManager = require('../app/dataManager');
 router.get('/filldata', function(req, res, next) {
     res.send('fill Data... i takes a long time');
     dataManager.fillData(function(){
-        console.log("finish");
+        dataManager.deletePoIWithoutName(function () {
+            dataManager.calcCoords(function () {
+                console.log("finish");
+            });
+        });
     });
 });
 

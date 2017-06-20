@@ -15,7 +15,7 @@ var job = new CronJob({
         console.log("---- Starte Verarbeitung");
 
         dataManager.fillData(function(){
-            dataManager.detectAdress(function(){
+            dataManager.deletePoIWithoutName(function(){
                 dataManager.calcCoords(function(){
                     console.log("Verarbeitung beendet!");
                     console.log("Naechste Ausfuehrung: 02:00 AM");
