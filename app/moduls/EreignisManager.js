@@ -70,13 +70,11 @@ exports.addEreignis = function (ereignis, callback) {
 function setUpCoords(eriegnisId, adresse) {
     calcCoords.initData(function () {
         var arryAdrss = adresse.split(',', 2);
-        var newAdress = arryAdrss[0];
-        if (arryAdrss[1] != "" && arryAdrss[1] != undefined){
-            newAdress += ", " + arryAdrss[1];
-        }
-        var coords = calcCoords.getCoords(newAdress); //TODO liefert zur Zeit oft undefined zurueck
+        var coords = calcCoords.getCoords(arryAdrss[0], arryAdrss[1]); //TODO liefert zur Zeit oft undefined zurueck, habe ihc daher angepasst
         if (coords){
             db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [coords.longitude, coords.latitude, eriegnisId]).catch(dbHelper.onError);
+        }else{
+            console.log(adresse + " nicht gefunden");
         }
     });
 }

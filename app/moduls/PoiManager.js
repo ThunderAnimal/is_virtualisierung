@@ -15,13 +15,13 @@ exports.initData = function (callback) {
         if (err) {
             throw err;
         }
-        contentPois = data;
+        contentPois = JSON.parse(data);
 
         fs.readFile(path.join(__dirname + '/../../resources/geoCodingJSON.json'),'utf8', function read(err, data) {
             if (err) {
                 throw err;
             }
-            contentGeo = data;
+            contentGeo = JSON.parse(data);
 
             if (typeof callback == "function"){
                 callback();
@@ -40,11 +40,8 @@ exports.fillData = function (callback) {
         return;
     }
 
-    var objGeo = JSON.parse(contentGeo);
-    var objPois = JSON.parse(contentPois);
-
     //Koerdinaten ermitteln und in DB speichern
-    getCoords(objGeo, objPois);
+    getCoords(contentGeo, contentPois);
 
     if (typeof callback == 'function'){
         callback();
@@ -91,7 +88,7 @@ function getCoords(objGeo, objPois) {
         var coords = new Array();
         for (j in objGeo)
         {
-            var street=  JSON.stringify(objGeo[j].Straße);
+            var street=  JSON.stringify(objGeo[j].street);
             street=street.split(':')[0];
             street= street.replace('{',"");
             street= street.replace(/\s/g,'');

@@ -13,7 +13,7 @@ exports.initData = function (callback) {
         if (err) {
             throw err;
         }
-        contentGeo = data;
+        contentGeo = JSON.parse(data);
 
         if (typeof callback == "function"){
             callback();
@@ -35,7 +35,49 @@ exports.initData = function (callback) {
  * @param address
  * @returns {{latitude: *, longitude: *}}
  */
-exports.getCoords = function(address) {
+/**
+ * @param street
+ * @param plz (Optional)
+ * @returns {{latitude: number, longitude: number}}
+ */
+exports.getCoords =function (street, plz) {
+    if (contentGeo == null){
+        console.error("GeoDaten sind nicht geladen!!!");
+        return {latitude: 0, longitude: 0};
+    }
+    street = street.replace(/\s/g,'');
+    for(var i = 0; i < contentGeo.length; i++){
+        if(street && plz){
+            if (Array.isArray(contentGeo[i].street)){
+                for (var j = 0; j<contentGeo[i].street.length; j++){
+                    if (plz == contentGeo[i].plz && street.toLowerCase() == contentGeo[i].street[j].toLowerCase()){
+                        return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                    }
+                }
+            }else{
+                if (plz == contentGeo[i].plz && street.toLowerCase() == contentGeo[i].street.toLowerCase()){
+                    return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                }
+            }
+
+        }else {
+            if (Array.isArray(contentGeo[i].street)) {
+                for (var j = 0; j < contentGeo[i].street.length; j++) {
+                    if (street.toLowerCase() == contentGeo[i].street[j].toLowerCase()) {
+                        return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                    }
+                }
+            }
+            else {
+                if (street.toLowerCase() == contentGeo[i].street.toLowerCase()){
+                    return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                }
+            }
+        }
+    }
+
+};
+/*exports.getCoords = function(address) {
     if (contentGeo == null){
         console.error("GeoDaten sind nicht geladen!!!");
         return {latitude: 0, longitude: 0};
@@ -113,5 +155,5 @@ exports.getCoords = function(address) {
 		}
 		
 	}
-};
+};*/
 
