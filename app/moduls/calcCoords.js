@@ -1,27 +1,45 @@
-fsGeo= require('fs');
-var contentGeo;
+var fs = require('fs');
+var path = require('path');
 
+var contentGeo = null;
 
-
-fsGeo.readFile('../src/geoCodingJSON.json','utf8', function read(err, data) {
-    if (err) {
-        throw err;
+exports.initData = function (callback) {
+    if (contentGeo != null){
+        callback();
+        return;
     }
-    contentGeo = data;
-	
-	//Examples
-	/*
-	console.log("Wartenberg");
-	getCoords( "Wartenberg");
-	console.log("Falkenberg");
-	getCoords( "Falkb");
-	console.log("Schillingstraße");
-	getCoords( "Schillingstraße, 10179");*/
-});
 
+    fs.readFile(path.join(__dirname + '/../../resources/geoCodingJSON.json'),'utf8', function read(err, data) {
+        if (err) {
+            throw err;
+        }
+        contentGeo = data;
 
-function getCoords(address)
-{
+        if (typeof callback == "function"){
+            callback();
+        }
+    });
+};
+
+/**
+ * Valide Input: Name (OPTINAL PLZ)
+ *      "Schillingstraße"
+ *      "Schillingstraße, 10179"
+ * Examples
+ *   console.log("Wartenberg");
+     getCoords( "Wartenberg");
+     console.log("Falkenberg");
+     getCoords( "Falkb");
+     console.log("Schillingstraße");
+     getCoords( "Schillingstraße, 10179");
+ * @param address
+ * @returns {{latitude: *, longitude: *}}
+ */
+exports.getCoords = function(address) {
+    if (contentGeo == null){
+        console.error("GeoDaten sind nicht geladen!!!");
+        return {latitude: 0, longitude: 0};
+    }
 	
 	address = address.replace(/\s/g,'');
 	var addr= address.split(',');
@@ -95,8 +113,5 @@ function getCoords(address)
 		}
 		
 	}
-	
-
-	
 };
 

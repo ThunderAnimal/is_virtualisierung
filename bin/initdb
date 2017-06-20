@@ -22,4 +22,5 @@ db.tx(function (t) {
     return t.batch([ q1,  q2,  q3,  q4,  q5,  q6,  q7,  q8,  q9]); // all of the queries are to be resolved;
 }).then(function (data) {
     console.log("Datenbank erfolgreich initialisiert");
+    process.exit(0);
 }).catch(dbHelper.onError);

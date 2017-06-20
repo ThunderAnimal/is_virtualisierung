@@ -11,13 +11,13 @@ var contentPois = null;
 var contentGeo = null;
 
 exports.initData = function (callback) {
-    fs.readFile(path.join(__dirname + '/../../src/pois.json') ,'utf8', function read(err, data) {
+    fs.readFile(path.join(__dirname + '/../../resources/pois.json') ,'utf8', function read(err, data) {
         if (err) {
             throw err;
         }
         contentPois = data;
 
-        fs.readFile(path.join(__dirname + '/../../src/geoCodingJSON.json'),'utf8', function read(err, data) {
+        fs.readFile(path.join(__dirname + '/../../resources/geoCodingJSON.json'),'utf8', function read(err, data) {
             if (err) {
                 throw err;
             }
