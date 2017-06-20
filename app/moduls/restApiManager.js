@@ -4,10 +4,11 @@
 request = require('request-json');
 
 var confApi = require('../../config/restApi');
-var client = request.createClient(confApi.uri);
+var clientContent = request.createClient(confApi.content.uri);
+var clientSummary = request.createClient(confApi.summary.uri);
 
 exports.getArticles = function(page, callback){
-    client.get('articles?page=' + page, function(err, res, body) {
+    clientContent.get('articles?page=' + page, function(err, res, body) {
         if (!err && res.statusCode == 200) {
             callback(body);
         } else {
@@ -17,7 +18,7 @@ exports.getArticles = function(page, callback){
 };
 
 exports.getReports = function(page, callback){
-    client.get('reports?page=' + page, function(err, res, body) {
+    clientContent.get('reports?page=' + page, function(err, res, body) {
         if (!err && res.statusCode == 200) {
             callback(body);
         } else {
@@ -26,12 +27,8 @@ exports.getReports = function(page, callback){
     });
 };
 
-exports.getPoi = function(page, callback){
-    callback();
-};
-
 exports.getArticlesPages = function(callback){
-    client.get('articles_pages/', function(err, res, body) {
+    clientContent.get('articles_pages/', function(err, res, body) {
         if (!err && res.statusCode == 200) {
             callback(body.pages);
         }else{
@@ -41,11 +38,31 @@ exports.getArticlesPages = function(callback){
 };
 
 exports.getReportPages = function(callback){
-    client.get('reports_pages/', function(err, res, body) {
+    clientContent.get('reports_pages/', function(err, res, body) {
          if (!err && res.statusCode == 200) {
              callback(body.pages);
          }else{
              console.error(err);
          }
      });
+};
+
+exports.getSumArticles = function (id, callback) {
+    clientSummary.get('articles?id=' + id,  function(err, res, body){
+        if (!err && res.statusCode == 200) {
+            callback(body);
+        } else {
+            console.error(err);
+        }
+    });
+};
+
+exports.getSumReports = function (id, callback) {
+    clientSummary.get('reports?id=' + id,  function(err, res, body){
+        if (!err && res.statusCode == 200) {
+            callback(body);
+        } else {
+            console.error(err);
+        }
+    });
 };
