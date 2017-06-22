@@ -67,12 +67,11 @@ exports.deleteDataWithputName = function (callback) {
 
 function getCoords(objGeo, objPois) {
     var all = new Array();
-    var len = objPois.length;
+    
+	// var y=calcCentroid(JSON.stringify(objPois[11].adressen));
+	//console.log(y.latitude);
 	
-	
-	
-	
-    for (i in  objPois)
+   for (i in  objPois)
     {
 		var name=  JSON.stringify(objPois[i].name);
 		
@@ -91,9 +90,9 @@ function getCoords(objGeo, objPois) {
 				var centroidCoords= calcCentroid(JSON.stringify(objPois[i].adressen));
 				//console.log("longi "+test.longitude);
 				var id = JSON.stringify(objPois[i].id);
-                id = id.substring(1,id.length-1);
+                id = id.substr(1,id.length-1);
                 var typ = JSON.stringify(objPois[i].typ);
-                typ = typ.substring(1,typ.length-1);
+                typ = typ.substr(1,typ.length-1);
                 var lat = centroidCoords.latitude;
                 var lon = centroidCoords.longitude;
                 poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon);
@@ -106,13 +105,13 @@ function getCoords(objGeo, objPois) {
 
                 if (coords.length==1)
                 {
-                    //console.log(coords[0]);
-					//console.log("added");
+                    console.log(coords[0]);
+					console.log("added Centroid");
                     addToDb(coords[0]);
                 }
 			
 		}
-		else (JSON.stringify(objPois[i].adressen).split(':').length==1)
+		if (JSON.stringify(objPois[i].adressen).split(':').length==1)
 		{
 			        var streetPoi=  JSON.stringify(objPois[i].adressen);
         
@@ -142,13 +141,13 @@ function getCoords(objGeo, objPois) {
 				
 				
                 var id = JSON.stringify(objPois[i].id);
-                id = id.substring(1,id.length-1);
+                id = id.substr(1,id.length-1);
                 var typ = JSON.stringify(objPois[i].typ);
-                typ = typ.substring(1,typ.length-1);
+                typ = typ.substr(1,typ.length-1);
                 var lat = JSON.stringify(objGeo[j].lat);
-                lat = lat.substring(1,lat.length-1);
+                lat = lat.substr(1,lat.length-1);
                 var lon = JSON.stringify(objGeo[j].lon);
-                lon = lon.substring(1,lon.length-1);
+                lon = lon.substr(1,lon.length-1);
                 poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon);
                 if (poi[0]!=null &&poi[1]!=null&& poi[2]!=null &&poi[3]!=null&& poi[4]!=null && coords.length==0)
                 {
@@ -159,8 +158,8 @@ function getCoords(objGeo, objPois) {
 
                 if (coords.length>0)
                 {
-                    //console.log(coords[0]);
-					//console.log("added");
+                    console.log(coords[0]);
+					console.log("added");
                     addToDb(coords[0]);
                 }
 				}
@@ -172,7 +171,7 @@ function getCoords(objGeo, objPois) {
 		}
 
     }
-    //console.log("All "+ all.length);
+    //console.log("All "+ all.length);*/
 }
 
 function calcCentroid(addresses)
@@ -202,14 +201,12 @@ function calcCentroid(addresses)
 					street= street.replace(/\s/g,'');
 					street = street.substr(1, street.length-2);
 					var poi = new Array();
-					if(addr[k]==street)
+					if(addr[k]==street && JSON.stringify(contentGeo[j].lon)!=null && JSON.stringify(contentGeo[j].lat)!=null )
 					{
 						var lat = JSON.stringify(contentGeo[j].lat);
-						lat = lat.substring(1,lat.length-1);
+						lat = lat.substr(1,lat.length-1);
 						var lon = JSON.stringify(contentGeo[j].lon);
-						lon = lon.substring(1,lon.length-1);
-						//console.log("lon" + lon);
-						//console.log("lon" + lat);
+						lon = lon.substr(1,lon.length-1);
 						poi.push(lon);poi.push(lat);
 						centroidCoords.push(poi);
 					}
