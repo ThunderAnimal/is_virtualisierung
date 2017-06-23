@@ -7,7 +7,7 @@ var dbHelper = require("../app/moduls/databaseHelper");
 
 db.tx(function (t) {
     // creating a sequence of transaction queries:
-    var q1 = t.none('CREATE TABLE IF NOT EXISTS denkmal (id varchar(255), typ  varchar(255), name varchar(255), lon float, lat float)');
+    var q1 = t.none('CREATE TABLE IF NOT EXISTS denkmal (id varchar(255), typ  varchar(255), name varchar(255), lon float, lat float, bezirk varchar(255))');
     var q2 = t.none('CREATE TABLE IF NOT EXISTS ereignis (id varchar(255), typ varchar(255), lon float, lat float)');
     var q3 = t.none('CREATE TABLE IF NOT EXISTS ereignis_content (id varchar(255), titel  varchar(255), description text, shortDescription text, bezirk varchar(255), adresse varchar(255), url text, zeitpunkt timestamp,  EreignisId varchar(255))')
     var q4 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_denkmal on denkmal (id)');

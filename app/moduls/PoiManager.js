@@ -73,29 +73,37 @@ function getCoords(objGeo, objPois) {
 	
    for (i in  objPois)
     {
-		var name=  JSON.stringify(objPois[i].name);
+		var name=  objPois[i].name;
+		if (Array.isArray(name)){
+			name = name[0];
+		}
 		
-		name=name.split(':')[0];
-        name= name.replace('{',"");
-        name= name.replace('}',"");
-        name= name.replace('[',"");
-        name= name.replace(']',"");
-        name= name.replace(/\s/g,'');
-        name = name.substr(1, name.length-2);
-        var coords = new Array();
+		var coords = new Array();
 		
 		if (JSON.stringify(objPois[i].adressen).split(':').length>1)
 		{
 				var poi = new Array();
 				var centroidCoords= calcCentroid(JSON.stringify(objPois[i].adressen));
 				//console.log("longi "+test.longitude);
-				var id = JSON.stringify(objPois[i].id);
-                id = id.substr(1,id.length-1);
-                var typ = JSON.stringify(objPois[i].typ);
-                typ = typ.substr(1,typ.length-1);
+				var id = objPois[i].id;
+                if(Array.isArray(id))
+				{
+					id= id[0];
+				}
+                var typ = objPois[i].typ;
+				if(Array.isArray(typ))
+				{
+					typ= typ[0];
+				}
+                //typ = typ.substr(1,typ.length-1);
                 var lat = centroidCoords.latitude;
                 var lon = centroidCoords.longitude;
-                poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon);
+				var location = objPois[i].ortsteil;
+				if(Array.isArray(location))
+				{
+					location= location[0];
+				}
+                poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon); poi.push(location);
                 if (poi[0]!=null &&poi[1]!=null&& poi[2]!=null &&poi[3]!=null&& poi[4]!=null && coords.length==0)
                 {
                     coords.push(poi);
@@ -113,24 +121,33 @@ function getCoords(objGeo, objPois) {
 		}
 		if (JSON.stringify(objPois[i].adressen).split(':').length==1)
 		{
-			        var streetPoi=  JSON.stringify(objPois[i].adressen);
+			
+		var streetPoi=  objPois[i].adressen;
+			if(Array.isArray(streetPoi))
+				{
+					streetPoi= streetPoi[0];
+				}		
         
-        streetPoi=streetPoi.split(':')[0];
-        streetPoi= streetPoi.replace('{',"");
-        streetPoi= streetPoi.replace(/\s/g,'');
-        streetPoi = streetPoi.substr(1, streetPoi.length-2);
-
+		//streetPoi=streetPoi.split(':')[0];
+        //streetPoi= streetPoi.replace('{',"");
+        //streetPoi= streetPoi.replace(/\s/g,'');
+        //streetPoi = streetPoi.substr(1, streetPoi.length-2);
+	
       
 		
 	
         for (j in objGeo)
         {
 			
-            var street=  JSON.stringify(objGeo[j].street);
-            street=street.split(':')[0];
-            street= street.replace('{',"");
-            street= street.replace(/\s/g,'');
-            street = street.substr(1, street.length-2);
+            var street=  objGeo[j].street;
+			if(Array.isArray(street))
+				{
+					street= street[0];
+				}
+            //street=street.split(':')[0];
+            //street= street.replace('{',"");
+            //street= street.replace(/\s/g,'');
+            //street = street.substr(1, street.length-2);
             var poi = new Array();
 			
 			
@@ -140,15 +157,36 @@ function getCoords(objGeo, objPois) {
 				
 				
 				
-                var id = JSON.stringify(objPois[i].id);
-                id = id.substr(1,id.length-1);
-                var typ = JSON.stringify(objPois[i].typ);
-                typ = typ.substr(1,typ.length-1);
-                var lat = JSON.stringify(objGeo[j].lat);
-                lat = lat.substr(1,lat.length-1);
-                var lon = JSON.stringify(objGeo[j].lon);
+                var id = objPois[i].id;
+                if(Array.isArray(id))
+				{
+					id= id[0];
+				}
+                var typ = objPois[i].typ;
+				if(Array.isArray(typ))
+				{
+					typ= typ[0];
+				}
+				var lat = objGeo[j].lat;
+                
+				if(Array.isArray(lat))
+				{
+					lat= lat[0];
+				}
+				//lat = lat.substr(1,lat.length-1);
+                var lon = objGeo[j].lon;
+				if(Array.isArray(lon))
+				{
+					lon= lon[0];
+				}
+				
                 lon = lon.substr(1,lon.length-1);
-                poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon);
+				var location = objPois[i].ortsteil;
+				if(Array.isArray(location))
+				{
+					location= location[0];
+				}
+                poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon);poi.push(location);
                 if (poi[0]!=null &&poi[1]!=null&& poi[2]!=null &&poi[3]!=null&& poi[4]!=null && coords.length==0)
                 {
                     coords.push(poi);
@@ -232,7 +270,7 @@ function calcCentroid(addresses)
 
 function addToDb(poiObject) {
     db.tx(function (t) {
-        var queryPois = t.none("INSERT INTO denkmal(id, typ, name, lon, lat) values($1, $2, $3, $4, $5)", poiObject);
+        var queryPois = t.none("INSERT INTO denkmal(id, typ, name, lon, lat, bezirk) values($1, $2, $3, $4, $5, $6)", poiObject);
         // returning a promise that determines a successful transaction:
         return t.batch([queryPois]); // all of the queries are to be resolved;
     }).then(function (data) {
