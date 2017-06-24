@@ -4,10 +4,13 @@
 var db = require("../app/moduls/databaseManager");
 var dbHelper = require("../app/moduls/databaseHelper");
 
+var fs = require('fs');
+var path = require('path');
+
 
 db.tx(function (t) {
     // creating a sequence of transaction queries:
-    var q1 = t.none('CREATE TABLE IF NOT EXISTS denkmal (id varchar(255), typ  varchar(255), name varchar(255), lon float, lat float, bezirk varchar(255))');
+    var q1 = t.none('CREATE TABLE IF NOT EXISTS denkmal (id varchar(255), typ  varchar(255), name varchar(255), bezirk varchar(255), lon float, lat float)');
     var q2 = t.none('CREATE TABLE IF NOT EXISTS ereignis (id varchar(255), typ varchar(255), lon float, lat float)');
     var q3 = t.none('CREATE TABLE IF NOT EXISTS ereignis_content (id varchar(255), titel  varchar(255), description text, shortDescription text, bezirk varchar(255), adresse varchar(255), url text, zeitpunkt timestamp,  EreignisId varchar(255))')
     var q4 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_denkmal on denkmal (id)');
@@ -16,11 +19,33 @@ db.tx(function (t) {
     var q7 = t.none('CREATE INDEX IF NOT EXISTS idx_denkmal_geocode on denkmal (lon, lat)');
     var q8 = t.none('CREATE INDEX IF NOT EXISTS idx_ereignis_geocode on ereignis (lon, lat)');
     var q9 = t.none('CREATE INDEX IF NOT EXISTS idx_ereignisid on ereignis_content (EreignisId)');
-	
+
+    var q10 = t.none('CREATE TABLE IF NOT EXISTS stamm_bezirke (name varchar(255), lon float, lat float )');
+    var q11 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_bezirk on stamm_bezirke (name)');
 
     // returning a promise that determines a successful transaction:
-    return t.batch([ q1,  q2,  q3,  q4,  q5,  q6,  q7,  q8,  q9]); // all of the queries are to be resolved;
+    return t.batch([ q1,  q2,  q3,  q4,  q5,  q6,  q7,  q8,  q9, q10,  q11]); // all of the queries are to be resolved;
 }).then(function (data) {
-    console.log("Datenbank erfolgreich initialisiert");
-    process.exit(0);
+
+    //Bezirke fuellen
+    fs.readFile(path.join(__dirname + '/../resources/bezirke.json') ,'utf8', function read(err, data) {
+        if (err) {
+            throw err;
+        }
+        var contentBezirke = JSON.parse(data);
+
+        db.none("DELETE FROM stamm_bezirke")
+            .then(function () {
+                db.tx(function (t) {
+                    var queue = [];
+                    for (var i = 0; i < contentBezirke.length; i++){
+                        queue.push(t.none("INSERT INTO stamm_bezirke(name, lon, lat) VALUES ($1, $2, $3)", [contentBezirke[i].name, contentBezirke[i].long, contentBezirke[i].lat]));
+                    }
+                    return t.batch(queue);
+                }).then(function () {
+                    console.log("Datenbank erfolgreich initialisiert");
+                    process.exit(0);
+                }).catch(dbHelper.onError);
+            }).catch(dbHelper.onError);
+    });
 }).catch(dbHelper.onError);

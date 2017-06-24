@@ -1,0 +1,63 @@
+[
+    {
+        "name": "Charlottenburg-Wilmersdorf",
+        "lat": "52.500000",
+        "long": "13.283333"
+    },
+    {
+        "name": "Friedrichshain-Kreuzberg",
+        "lat": "52.499567",
+        "long": "13.431419"
+    },
+    {
+        "name": "Lichtenberg",
+        "lat": "52.521111",
+        "long": "13.480000"
+    },
+    {
+        "name": "Marzahn-Hellersdorf",
+        "lat": "52.522935",
+        "long": "13.576597"
+    },
+    {
+        "name": "Mitte",
+        "lat": "52.519597",
+        "long": "13.376855"
+    },
+    {
+        "name": "Neukölln",
+        "lat": "52.483333",
+        "long": "13.450000"
+    },
+    {
+        "name": "Pankow",
+        "lat": "52.582501",
+        "long": "13.431302"
+    },
+    {
+        "name": "Reinickendorf",
+        "lat": "52.566667",
+        "long": "13.333333"
+    },
+    {
+        "name": "Spandau",
+        "lat": "52.534080",
+        "long": "13.181716"
+    },
+    {
+        "name": "Steglitz-Zehlendorf",
+        "lat": "52.430884",
+        "long": "13.192662"
+    },
+    {
+        "name": "Tempelhof-Schöneberg",
+        "lat": "52.472160",
+        "long": "13.370287"
+    },
+    {
+        "name": "Treptow-Köpenick",
+        "lat": "52.450000",
+        "long": "13.566667"
+    }
+
+]
