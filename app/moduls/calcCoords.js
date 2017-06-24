@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var RestApi = require("./restApiManager");
 
 var contentGeo = null;
 
@@ -21,6 +22,39 @@ exports.initData = function (callback) {
     });
 };
 
+exports.getCoords = function (adresse, callback) {
+    var that = this;
+
+    var arryAdrss = adresse.split(',', 2);
+    if (arryAdrss[1]){
+        adresse = arryAdrss[0] + ',' + arryAdrss[1];
+    }else{
+        adresse = arryAdrss[0];
+    }
+
+    var coords = getCoordsFromJson(arryAdrss[0], arryAdrss[1]);
+    if(coords){
+        callback(coords);
+        return
+    }
+
+    //Sicherstellen das Objekt in Berlin liegt
+    var adresseBerlin = adresse + " Berlin";
+    getCoordsFromMapsApi(adresseBerlin, function (coords) {
+        if (coords){
+            callback(coords);
+            return;
+        }
+        getCoordsFromMapsApi(adresse, function (coords) {
+            if (coords){
+                callback(coords);
+            }else{
+                callback(undefined);
+            }
+        })
+    });
+};
+
 /**
  * Valide Input: Name (OPTINAL PLZ)
  *      "Schillingstraße"
@@ -38,12 +72,12 @@ exports.initData = function (callback) {
 /**
  * @param street
  * @param plz (Optional)
- * @returns {{latitude: number, longitude: number}}
+ * @returns {{lat: number, lon: number}}
  */
-exports.getCoords =function (street, plz) {
+var getCoordsFromJson = function (street, plz) {
     if (contentGeo == null){
         console.error("GeoDaten sind nicht geladen!!!");
-        return {latitude: 0, longitude: 0};
+        return undefined;
     }
     street = street.replace(/\s/g,'');
     for(var i = 0; i < contentGeo.length; i++){
@@ -51,12 +85,12 @@ exports.getCoords =function (street, plz) {
             if (Array.isArray(contentGeo[i].street)){
                 for (var j = 0; j<contentGeo[i].street.length; j++){
                     if (plz == contentGeo[i].plz && street.toLowerCase() == contentGeo[i].street[j].toLowerCase()){
-                        return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                        return {lat: contentGeo[i].lat, lon: contentGeo[i].lon};
                     }
                 }
             }else{
                 if (plz == contentGeo[i].plz && street.toLowerCase() == contentGeo[i].street.toLowerCase()){
-                    return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                    return {lat: contentGeo[i].lat, lon: contentGeo[i].lon};
                 }
             }
 
@@ -64,96 +98,41 @@ exports.getCoords =function (street, plz) {
             if (Array.isArray(contentGeo[i].street)) {
                 for (var j = 0; j < contentGeo[i].street.length; j++) {
                     if (street.toLowerCase() == contentGeo[i].street[j].toLowerCase()) {
-                        return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                        return {lat: contentGeo[i].lat, lon: contentGeo[i].lon};
                     }
                 }
             }
             else {
                 if (street.toLowerCase() == contentGeo[i].street.toLowerCase()){
-                    return {latitude: contentGeo[i].lat, longitude: contentGeo[i].lon};
+                    return {lat: contentGeo[i].lat, lon: contentGeo[i].lon};
                 }
             }
         }
     }
 
 };
-/*exports.getCoords = function(address) {
-    if (contentGeo == null){
-        console.error("GeoDaten sind nicht geladen!!!");
-        return {latitude: 0, longitude: 0};
-    }
-	
-	address = address.replace(/\s/g,'');
-	var addr= address.split(',');
-	
-	objGeo = JSON.parse(contentGeo);
-	
-	for (i in  objGeo)
-	{
-		var street=  JSON.stringify(objGeo[i].Straße);
-					street=street.split(':')[0];
-					street= street.replace('{',"");
-					street= street.replace(/\s/g,'');
-					street = street.substr(1, street.length-2);
-		var zip =	JSON.stringify(objGeo[i].plz);
-					
-		
-		var coords= new Array(); 
-		if (address.length>3)
-		{
-				
-			 if (JSON.stringify(objGeo[i].Straße.length==1) && street==addr[0]  && typeof zip != 'undefined' && coords.length==0)
-				{
-					zip = zip.substr(1, zip.length-2);
-					if (zip ==addr[1])
-					{
-						var lat = JSON.stringify(objGeo[i].lat);
-							lat = lat.substring(1,lat.length-1);
-							var lon = JSON.stringify(objGeo[i].lon);
-							lon = lon.substring(1,lon.length-1);
-							coords.push(lat); coords.push(lon);
-							var result = {latitude: coords[0], longitude: coords[1]};
-							console.log("lat "+result.latitude);
-							return result;
-					}
-				}
-				
-				if (JSON.stringify(objGeo[i].Straße.length==1) && street==addr[0]  && typeof zip == 'undefined' && coords.length==0)
-				{
-					
-							var lat = JSON.stringify(objGeo[i].lat);
-							lat = lat.substring(1,lat.length-1);
-							var lon = JSON.stringify(objGeo[i].lon);
-							lon = lon.substring(1,lon.length-1);
-							
-							coords.push(lat); coords.push(lon);
-							var result = {latitude: coords[0], longitude: coords[1]};
-							console.log("lat "+result.latitude);
-							return result;
-					
-				}
-				 if (objGeo[i].Straße.length>1 && coords.length==0)
-				 {
-					 for (j=0; j<objGeo[i].Straße.length;j++)
-					 {
-						var str =JSON.stringify(objGeo[i].Straße[j]);
-						str= str.substr(1, str.length-2);
-						 if (addr[0]==str)
-						 {
-							var lat = JSON.stringify(objGeo[i].lat);
-							lat = lat.substring(1,lat.length-1);
-							var lon = JSON.stringify(objGeo[i].lon);
-							lon = lon.substring(1,lon.length-1);
-							coords.push(lat); coords.push(lon);
-							var result = {latitude: coords[0], longitude: coords[1]};
-							console.log("lat "+result.latitude);
-							return result;
-						 }
-					 }
-				 }
-				
-		}
-		
-	}
-};*/
 
+/**
+ *
+ * @param adresse
+ * @param callback
+ */
+var getCoordsFromMapsApi = function (adresse, callback) {
+    RestApi.getGeoCoords(adresse, function (data) {
+        if(!data){
+            callback(undefined);
+            return
+        }
+
+        if (data.length == 0){
+            callback(undefined);
+            return;
+        }
+        if (data[0].address.state != "Berlin") {
+            callback(undefined);
+            return;
+        }
+
+        callback({lat: data[0].lat, lon: data[0].lon});
+    })
+};

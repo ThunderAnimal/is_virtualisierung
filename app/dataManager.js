@@ -5,6 +5,15 @@ var RestManager = require('./moduls/restApiManager');
 var EreignisManager = require('./moduls/EreignisManager');
 var PoIManager = require('./moduls/PoiManager');
 
+exports.exec = function (callback) {
+    var that = this;
+    that.fillData(function(){
+        that.deletePoIWithoutName(function(){
+            callback();
+        });
+    });
+};
+
 exports.fillData = function(callback){
     console.log("Fill Data:");
     fillDataArticles(function(){
@@ -20,12 +29,6 @@ exports.deletePoIWithoutName = function (callback) {
     //Datenbank durchgehen und pruefen ob name gefuellt, wenn nicht dann Poi loeschen
     console.log("Delete PoI Without Name");
     PoIManager.deleteDataWithputName(callback);
-};
-
-exports.calcCoords = function(callback){
-    //TODO Datenbak durchgehen und prufen ob koordinaten gefuellt sind, wenn nicht dann úber die adresse die Koordinaten ermitteln
-    console.log("Calc Coords");
-    callback();
 };
 
 function fillDataArticles(callback){

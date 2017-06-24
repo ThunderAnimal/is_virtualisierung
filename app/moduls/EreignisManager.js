@@ -4,8 +4,8 @@
 
 var db = require('../moduls/databaseManager');
 var dbHelper = require("../moduls/databaseHelper");
-var RestApi = require("../moduls/restApiManager");
 var calcCoords = require("../moduls/calcCoords");
+var RestApi = require("./restApiManager");
 var uuid = require("uuid");
 
 exports.addEreignis = function (ereignis, callback) {
@@ -24,12 +24,13 @@ exports.addEreignis = function (ereignis, callback) {
         db.none("INSERT INTO ereignis_content(id, titel, description, bezirk, adresse, url, zeitpunkt, ereignisid) " +
             "VALUES(${id}, ${titel}, ${inhalt}, ${bezirk}, ${adresse}, ${url}, ${meldungszeitpunkt}, ${ownId})", ereignis)
             .then(function (data) {
-                setUpCoords(ereignis.ownId, ereignis.adresse);
-                setUpSummaryFromApi(ereignis.id, ereignis.kategorie);
-                if (typeof callback == 'function'){
-                    callback();
-                }
-
+                setUpCoords(ereignis.ownId, ereignis.adresse, function () {
+                    setUpSummaryFromApi(ereignis.id, ereignis.kategorie, function () {
+                        if (typeof callback == 'function'){
+                            callback();
+                        }
+                    });    
+                });
             }).catch(function(error){dbHelper.onError(error);callback()});
     };
 
@@ -59,69 +60,57 @@ exports.addEreignis = function (ereignis, callback) {
                                 ereignis.ownId = data[0].ereignisid;
                                 func_createContent();
                             }
-                        }).catch(dbHelper.onError);
+                        }).catch(function(error){dbHelper.onError(error);callback()});
                 }
             }
 
-        }).catch(dbHelper.onError);
+        }).catch(function(error){dbHelper.onError(error);callback()});
 };
 
 
-function setUpCoords(eriegnisId, adresse) {
-    calcCoords.initData(function () {
-        var arryAdrss = adresse.split(',', 2);
-        var coords = calcCoords.getCoords(arryAdrss[0], arryAdrss[1]); //TODO liefert zur Zeit oft undefined zurueck, habe ihc daher angepasst
-        if (coords){
-            db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [coords.longitude, coords.latitude, eriegnisId]).catch(dbHelper.onError);
-        }else{
-            //Wenn nicht gefunden dan ueber API von openStreetMaop danach suchen
-            if (arryAdrss[1]){
-                adresse = arryAdrss[0] + ',' + arryAdrss[1];
-            }else{
-                adresse = arryAdrss[0];
-            }
-            var adresseBerlin = adresse + " Berlin";
-
-            setTimeout(function () { //Timeout to reduce change of Ddos
-                RestApi.getGeoCoords(adresseBerlin, function (data){
-                    if (data.length == 0){
-                        setTimeout(function () {
-                            RestApi.getGeoCoords(adresse, function (data) {
-                                if (data.length == 0) {
-                                    console.log(adresse + " nicht gefunden");
-                                } else {
-                                    if (data[0].address.state != "Berlin"){
-                                        console.log(adresse + " nicht in Berlin gefunden");
-                                    }else{
-                                        db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [data[0].lon, data[0].lat, eriegnisId]).catch(dbHelper.onError);
-                                    }
-                                }
-                            });
-                        }, Math.floor(Math.random() * 300000) + 15000 );
-                    } else{
-                        db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [data[0].lon, data[0].lat, eriegnisId]).catch(dbHelper.onError);
-                    }
-                }, Math.floor(Math.random() * 300000) + 15000);
-            });
-
-
+var cacheMissCoordsList = [];
+function setUpCoords(eriegnisId, adresse, callback) {
+    //System beschleunigen fuer Adressen die nicht gefunden wurden
+    for (var i = 0; i < cacheMissCoordsList.length;i++){
+        if (adresse == cacheMissCoordsList[i]){
+            callback();
+            return;
         }
+    }
+
+    calcCoords.initData(function () {
+        calcCoords.getCoords(adresse, function (coords) {
+            if (!coords){
+                cacheMissCoordsList.push(adresse);
+                console.log("Adresse: " + adresse + " konnte nicht geocodiert werden.");
+            }
+            else{
+                db.none("UPDATE ereignis SET lon = $1, lat = $2 WHERE id=$3", [coords.lon, coords.lat, eriegnisId]).catch(dbHelper.onError);
+            }
+
+            callback();
+        });
     });
 }
 
-function setUpSummaryFromApi (id, typ) {
+function setUpSummaryFromApi (id, typ, callback) {
     var addSum = function (id, text) {
         db.none("UPDATE ereignis_content SET shortdescription = $1 WHERE id = $2", [text, id]).catch(dbHelper.onError);
     };
 
     if (typ == "ZEITUNGSARTIKEL"){
-        //TODO uncomment when API is finished
-        /*RestApi.getSumArticles(ereignisId, function (data) {
-           addSum(ereignisId,data[0].zusammenfassung);
-        });*/
+        RestApi.getSumArticles(id, function (data) {
+            if (data[0]){
+                addSum(id,data[0].zusammenfassung);
+            }
+            callback();
+        });
     }else{
         RestApi.getSumReports(id, function (data) {
-            addSum(id,data[0].zusammenfassung);
+            if (data[0]){
+                addSum(id,data[0].zusammenfassung);
+            }
+            callback();
         });
     }
 };

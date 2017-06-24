@@ -15,6 +15,7 @@ exports.getArticles = function(page, callback){
             callback(body);
         } else {
             console.error(err);
+            callback(null);
         }
     });
 };
@@ -25,6 +26,7 @@ exports.getReports = function(page, callback){
             callback(body);
         } else {
             console.error(err);
+            callback(null);
         }
     });
 };
@@ -35,6 +37,7 @@ exports.getArticlesPages = function(callback){
             callback(body.pages);
         }else{
             console.error(err);
+            callback(null);
         }
     });
 };
@@ -45,6 +48,7 @@ exports.getReportPages = function(callback){
              callback(body.pages);
          }else{
              console.error(err);
+             callback(null);
          }
      });
 };
@@ -55,6 +59,7 @@ exports.getSumArticles = function (id, callback) {
             callback(body);
         } else {
             console.error(err);
+            callback(null);
         }
     });
 };
@@ -65,6 +70,7 @@ exports.getSumReports = function (id, callback) {
             callback(body);
         } else {
             console.error(err);
+            callback(null);
         }
     });
 };
@@ -76,6 +82,7 @@ exports.getGeoCoords = function (adresse, callback) {
             callback(body);
         } else {
             console.error(err);
+            callback(null);
         }
     });
 };

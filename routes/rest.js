@@ -9,12 +9,8 @@ var dataManager = require('../app/dataManager');
 /* REST API  */
 router.get('/filldata', function(req, res, next) {
     res.send('fill Data... i takes a long time');
-    dataManager.fillData(function(){
-        dataManager.deletePoIWithoutName(function () {
-            dataManager.calcCoords(function () {
-                console.log("finish");
-            });
-        });
+    dataManager.exec(function () {
+        console.log("Verarbeitung beendet!");
     });
 });
 

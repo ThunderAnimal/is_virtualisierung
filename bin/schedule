@@ -13,14 +13,9 @@ var job = new CronJob({
          * at 02:00 AM.
          */
         console.log("---- Starte Verarbeitung");
-
-        dataManager.fillData(function(){
-            dataManager.deletePoIWithoutName(function(){
-                dataManager.calcCoords(function(){
-                    console.log("Verarbeitung beendet!");
-                    console.log("Naechste Ausfuehrung: 02:00 AM");
-                });
-            });
+        dataManager.exec(function () {
+            console.log("Verarbeitung beendet!");
+            console.log("Naechste Ausfuehrung: 02:00 AM");
         });
     },
     start: false,
@@ -31,8 +26,9 @@ var job = new CronJob({
 console.log("#############  Schedule #############");
 console.log("- Daten holen");
 console.log("- Datenbank fuellen");
-console.log("- Adressen aus Text ermitteln");
-console.log("- Geocoding durchfuehren");
+console.log("- Geocoordinaten aus Adresse ermitteln");
+console.log("- Summary der Inhalte ermitteln");
+console.log("- Bauwerke ohne Namen loeschen");
 console.log("");
 console.log("Ausfuehrung: 02:00 AM");
 job.start();
