@@ -1,117 +1,321 @@
- $(document).ready(function(){
- 	
- 	$(".button-collapse").sideNav();
+var googleApiKey = "AIzaSyDokUDCoq4oDQbX_s_-U7BXr2OwhQQND0I";
 
-  $('ul.tabs').tabs({ 'swipeable': false });
+var googleMap = {};
+var googleOverlappingMarker = {};
+var googleInfoWindow = {};
+
+var typEreignis = {
+    zusammengefasst: "ZUSAMMENFASSUNG",
+    polizei: "POLIZEI",
+    feuerwehr: "FEUERWEHR",
+    zeitungsartikel: "ZEITUNGSARTIKEL",
+    ensemble: "Ensemble",
+    denkmal: "Denkmal"
+
+};
+
+$(document).ready(function(){
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&key=' + googleApiKey +'&callback=initializeMap';
+    document.body.appendChild(script);
+
+    $(".button-collapse").sideNav();
+    $('ul.tabs').tabs({ 'swipeable': false });
 
 
-  
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&'+'callback=initialize';
-  document.body.appendChild(script);
+    $('#googleMap').height($( window ).height() - 112);
+    $('#filterContainer').height($( window ).height() - 112);
+    $('.tabs-content').height($( window ).height() - 112);
 
-  $('#googleMap').height($( window ).height() - 112);
-  $('#filterContainer').height($( window ).height() - 112);
-  $('.tabs-content').height($( window ).height() - 112);
-
- 
-  
+    //TRIGGER EVENTS
+    $('.filterInput').change(function() {
+        loadMarkers(addMarkers);
+    });
 
 });
 
-  function loadKey() {
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src ="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwWBLT5II8keeKom6TKDZUt1_XjbBggvQ&callback=initialize";
-      document.body.appendChild(script);
-
-      }
-	  
-  function initialize() {
-     var infowindow = new google.maps.InfoWindow();
-     var map = new google.maps.Map(document.getElementById('googleMap'), {
+function initializeMap() {
+    googleMap = new google.maps.Map(document.getElementById('googleMap'), {
         center: {lat: 52.520008, lng: 13.404954},
         scrollwheel: true,
         zoom: 12
+    });
+
+    googleInfoWindow = new google.maps.InfoWindow();
+
+    googleOverlappingMarker = new OverlappingMarkerSpiderfier(googleMap, {
+        markersWontMove: true,
+        markersWontHide: true,
+        basicFormatEvents: true,
+        keepSpiderfied: true
+    });
+
+    //using instead of boundce_change, also fired on startup of the map
+    google.maps.event.addListener(googleMap, 'idle', function() {
+        loadMarkers(addMarkers);
+    });
+
+    google.maps.event.addListener(googleInfoWindow, 'domready', function () {
+        // Reference to the DIV that wraps the bottom of infowindow
+        var iwOuter = $('.gm-style-iw');
+
+        /* Since this div is in a position prior to .gm-div style-iw.
+         * We use jQuery and create a iwBackground variable,
+         * and took advantage of the existing reference .gm-style-iw for the previous div with .prev().
+         */
+        var iwBackground = iwOuter.prev();
+
+        // Removes background shadow DIV
+        iwBackground.children(':nth-child(2)').css({'display' : 'none'});
+
+        // Removes white background DIV
+        iwBackground.children(':nth-child(4)').css({'display' : 'none'});
+
+        // Changes the desired tail shadow color.
+        iwBackground.children(':nth-child(3)').find('div').children().css({'box-shadow': 'rgba(0,0,0,0.12) 0px 1px 6px', 'z-index' : '1'});
+
+        // Reference to the div that groups the close button elements.
+        var iwCloseBtn = iwOuter.next();
+
+        // Apply the desired effect to the close button
+        iwCloseBtn.css({opacity: '1', right: '30px', top: '15px'});
+
+    });
+}
+
+function loadMarkers(callback) {
+    var bounds = googleMap.getBounds();
+
+    //Input Parameters for REST-Api
+    var minLat = bounds.f.b;
+    var maxLat = bounds.f.f;
+    var minLon = bounds.b.b;
+    var maxLon = bounds.b.f;
+
+    var filterPolizei = $("#filterPolizei").is(":checked");
+    var filterFeuerwehr = $("#filterFeuerwehr").is(":checked");
+    var filterArtikel = $("#filterArtikel").is(":checked");
+    var filterDenkmal = $("#filterDenkmal").is(":checked");
+
+    var filterLatest = $("#filterLateest").is(":checked");
+
+    //TODO CALL REST API with Input Parameters
+    console.log("LOAD MARKERS:");
+    console.log(minLat);
+    console.log(maxLat);
+    console.log(minLon);
+    console.log(maxLon);
+
+    console.log(filterPolizei);
+    console.log(filterFeuerwehr);
+    console.log(filterArtikel);
+    console.log(filterDenkmal);
+    console.log(filterLatest);
+
+    //DUMMY DATA
+    var markers = [{
+        type: "ZEITUNGSARTIKEL",
+        lat: "52.520000",
+        long:"13.404950",
+        ereignisId: "1"
+    },{
+        type: "ZUSAMMENFASSUNG",
+        lat: "52.450000",
+        long:"13.566667",
+        anzahl: "2300"
+    },{
+        type: "POLIZEI",
+        lat: "52.500000",
+        long:"13.404950",
+        ereignisId: "3"
+    },{
+        type: "FEUERWEHR",
+        lat: "52.500000",
+        long:"13.404950",
+        ereignisId: "4"
+    },{
+        type: "POLIZEI",
+        lat: "52.500000",
+        long:"13.404950",
+        ereignisId: "4"
+    },{
+        type: "Denkmal",
+        lat: "52.510000",
+        long:"13.404950",
+        ereignisId: "4"
+    }];
+
+    //TODO CALL REST API
+    callback(markers);
+}
+
+function addMarkers(markers) {
+    googleOverlappingMarker.removeAllMarkers();
+    for (var i = 0; i < markers.length; i++) {
+        var lat = parseFloat(markers[i].lat).toFixed(7);
+        var long = parseFloat(markers[i].long).toFixed(7);
+
+        if (markers[i].type == typEreignis.zusammengefasst) {
+            addMarkerZusammenfassung(markers[i], lat, long);
+            continue;
+        }
+
+        switch (markers[i].type) {
+            case typEreignis.polizei:
+                var icon = '../img/GooglePin-Polizei.png';
+                break;
+            case typEreignis.feuerwehr:
+                var icon = '../img/GooglePin-Feuerwehr.png';
+                break;
+            case typEreignis.zeitungsartikel:
+                var icon = '../img/GooglePin-Zeitungsartikel.png';
+                break;
+            case typEreignis.ensemble:
+            case typEreignis.denkmal:
+                var icon = '../img/GooglePin-PoI.png';
+                break;
+        }
+
+        var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(lat, long),
+            icon: icon,
+            ereignisid: markers[i].ereignisId,
+            type: markers[i].type
         });
-		
-		
-		var count = 0;
-		var positionList = new Array("52.520000;13.404950", "52.510000;13.414950", "52.500000;13.404950");
-		//die Marker wurde online unter http://earth.google.com/images/kml-icons/track-directional/track-0.png genommen
-		while(count < positionList.length ){
-		  
-		  var lat=parseFloat(positionList[count].split(';')[0]).toFixed(7);
-		   var long=parseFloat(positionList[count].split(';')[1]).toFixed(7);
-		   
-		 var marker = new google.maps.Marker({
-          position:  new google.maps.LatLng(lat, long),
-           icon:'http://earth.google.com/images/kml-icons/track-directional/track-0.png',
-          map: map
+
+        google.maps.event.addListener(marker, 'spider_click', function (event) {
+            var that = this;
+            loadMarkerDetail(that.ereignisid, that.type, function (data) {
+                googleInfoWindow.setContent(getInfoWindowContent(data, that.type));
+                googleInfoWindow.open(googleMap, that);
+            });
         });
-		count ++;
+        googleOverlappingMarker.addMarker(marker);
+    }
+}
 
-	
-		google.maps.event.addListener(marker, 'click', function(event){
-
-				    var lat = event.latLng.lat();
-					var lng = event.latLng.lng();
-                    var formStr =  "<div class='infowindow' style='color:blue'>Text Info <br /><br />Lat:  "+lat+" <br /><br /> Long:  "+lng+"</div>";
-					
-					var latLng = event.latLng;
-					 infowindow.setContent(formStr);
-						infowindow.setPosition(latLng);
-						// alert("Lat=" + lat + "; Lng=" + lng);
-						infowindow.open(map, this);
-						
-				  });
-		}
-
-
-		//einfach position markieren:  ohne coustom marker
-	  
-		/*while(count < positionList.length ){  
-		  var lat=parseFloat(positionList[count].split(';')[0]).toFixed(7);
-		   var long=parseFloat(positionList[count].split(';')[1]).toFixed(7);
-		 var marker = new google.maps.Marker({
-          position:  new google.maps.LatLng(lat, long),
-          map: map
+function addMarkerZusammenfassung(markerData, lat, long) {
+    generateLargeIconNumber(markerData.anzahl, function (icon) {
+        var marker = new google.maps.Marker({
+            position:  new google.maps.LatLng(lat, long),
+            icon: icon,
+            ereignisid: markerData.ereignisId,
+            typ: markerData.typ
         });
-		count ++;
+        googleOverlappingMarker.addMarker(marker);
+    });
+}
 
-		google.maps.event.addListener(marker, 'click', function(event){
+function loadMarkerDetail(ereignisId, typ, callback) {
+    //TODO call REST API
+    callback();
+}
 
-				    var lat = event.latLng.lat();
-					var lng = event.latLng.lng();
-                    var formStr =  "<div class='infowindow' style='color:blue'>Text Info <br /><br />Lat:  "+lat+" <br /><br /> Long:  "+lng+"</div>";
-					
-					var latLng = event.latLng;
-					 infowindow.setContent(formStr);
-						infowindow.setPosition(latLng);
-						// alert("Lat=" + lat + "; Lng=" + lng);
-						infowindow.open(map, this);
-						
-				  });
-		}*/
+function getInfoWindowContent(data, typ) {
+    console.log(typ);
+    switch (typ){
+        case typEreignis.polizei: var img = '../img/polizei.png';
+            break;
+        case typEreignis.feuerwehr: var img = '../img/feuerwehr.png';
+            break;
+        case typEreignis.zeitungsartikel: var img = '../img/zeitungsartikel.png';
+            break;
+        case typEreignis.ensemble:
+        case typEreignis.denkmal: var img = '../img/poi.png';
+            break;
+    }
 
-      
-	  
-	  
+    var formStr =  '<div id="iw-container">' +
+        '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
+            '<div class="card-image">' +
+                '<img src="' + img + '">' +
+            '</div>' +
+            '<div class="card-stacked">' +
+                '<div class="card-content">' +
+                    '<div class="card-title">Title oder Name vom Ereignis</div>' +
+                    '<div class="card-metadata valign-wrapper"><i class="material-icons">my_location</i>Max Mustermanstarn Strasse <i class="material-icons">today</i>22.05.2014</div> ' +
+                    '<p>I am a very simple card. I am good at containing small bits of information. Hier wird die short description angezeigt</p>' +
+                '</div>' +
+                '<div class="card-action">' +
+                    '<a href="#">URL zum artikel</a>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    return formStr;
+}
 
+//Alternative Option for Standard Marker
+//Source: https://stackoverflow.com/questions/2890670/google-maps-place-number-in-marker
+var generateIconCache = {};
+function generateLargeIconNumber(number, callback) {
+    if (generateIconCache[number] !== undefined) {
+        callback(generateIconCache[number]);
+    }
 
-      }
+    var fontSize = 16,
+        imageWidth = imageHeight = 35;
 
+    if (number >= 1000) {
+        fontSize = 10;
+        imageWidth = imageHeight = 55;
+    } else if (number < 1000 && number > 100) {
+        fontSize = 14;
+        imageWidth = imageHeight = 45;
+    }
+
+    var svg = d3.select(document.createElement('div')).append('svg')
+        .attr('viewBox', '0 0 54.4 54.4')
+        .append('g')
+
+    var circles = svg.append('circle')
+        .attr('cx', '27.2')
+        .attr('cy', '27.2')
+        .attr('r', '21.2')
+        .style('fill', '#2063C6');
+
+    var path = svg.append('path')
+        .attr('d', 'M27.2,0C12.2,0,0,12.2,0,27.2s12.2,27.2,27.2,27.2s27.2-12.2,27.2-27.2S42.2,0,27.2,0z M6,27.2 C6,15.5,15.5,6,27.2,6s21.2,9.5,21.2,21.2c0,11.7-9.5,21.2-21.2,21.2S6,38.9,6,27.2z')
+        .attr('fill', '#FFFFFF');
+
+    var text = svg.append('text')
+        .attr('dx', 27)
+        .attr('dy', 32)
+        .attr('text-anchor', 'middle')
+        .attr('style', 'font-size:' + fontSize + 'px; fill: #FFFFFF; font-family: Arial, Verdana; font-weight: bold')
+        .text(number);
+
+    var svgNode = svg.node().parentNode.cloneNode(true),
+        image = new Image();
+
+    d3.select(svgNode).select('clippath').remove();
+
+    var xmlSource = (new XMLSerializer()).serializeToString(svgNode);
+
+    image.onload = (function(imageWidth, imageHeight) {
+        var canvas = document.createElement('canvas'),
+            context = canvas.getContext('2d'),
+            dataURL;
+
+        d3.select(canvas)
+            .attr('width', imageWidth)
+            .attr('height', imageHeight);
+
+        context.drawImage(image, 0, 0, imageWidth, imageHeight);
+
+        dataURL = canvas.toDataURL();
+        generateIconCache[number] = dataURL;
+
+        callback(dataURL);
+    }).bind(this, imageWidth, imageHeight);
+
+    image.src = 'data:image/svg+xml;base64,' + btoa(encodeURIComponent(xmlSource).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+            return String.fromCharCode('0x' + p1);
+        }));
+}
 
 	   
-	   function userEvent(){
-	              google.maps.event.addListenerOnce(map, 'click', function(){
 
-				    var lat = event.latLng.lat();
-					var lng = event.latLng.lng();
-  
-					alert("Lat=" + lat + "; Lng=" + lng);
-				  });
-	   }
+
 
 	  

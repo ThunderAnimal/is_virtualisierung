@@ -1,58 +1,50 @@
 extends template_navbar
 
 block content
-	#maps.col.s12
-		.row
-			#filterContainer.col.s3
-				h4.header Filter
-				form
-					p
-						input#filterPolizei(type="checkbox", checked="checked")
-						label(for='filterPolizei') Polizeieinsätze
-					p
-						input#filterFeuerwehr(type="checkbox", checked="checked")
-						label(for='filterFeuerwehr') Feuerwehreinsätze
-					p
-						input#filterArtikel(type="checkbox", checked="checked")
-						label(for='filterArtikel') Zeitungsartikel
-					p
-						input#filterDenkmal(type="checkbox", checked="checked")
-						label(for='filterDenkmal') Denkmäler
-				form(style="padding-top:20px")
-					p
-						input#filterLateest(type="checkbox")
-						label(for='filterLateest') nur neustes Meldungen Zeigen
+    #maps.col.s12
+        .row
+            #filterContainer.col.s4.m3.l2
+                h4.header Filter
+                form
+                    p
+                        input#filterPolizei.filterInput(type="checkbox", checked="checked")
+                        label(for='filterPolizei') Polizeieinsätze
+                    p
+                        input#filterFeuerwehr.filterInput(type="checkbox", checked="checked")
+                        label(for='filterFeuerwehr') Feuerwehreinsätze
+                    p
+                        input#filterArtikel.filterInput(type="checkbox", checked="checked")
+                        label(for='filterArtikel') Zeitungsartikel
+                    p
+                        input#filterDenkmal.filterInput(type="checkbox", checked="checked")
+                        label(for='filterDenkmal') Denkmäler
+                form(style="padding-top:20px")
+                    p
+                        input#filterLateest.filterInput(type="checkbox")
+                        label(for='filterLateest') nur neustes Meldungen Zeigen
 
-				h4.header Information
-				.card.horizontal
-					.card-stacked
-						.card-content
-							p I am a very simple card. I am good at containing small bits of information.
-						.card-action
-							a(href='#') This is a link
-				.card.horizontal
-					.card-stacked
-						.card-content
-							p I am a very simple card. I am good at containing small bits of information.
-						.card-action
-							a(href='#') This is a link
-				.card.horizontal
-					.card-stacked
-						.card-content
-							p I am a very simple card. I am good at containing small bits of information.
-						.card-action
-							a(href='#') This is a link
-			
-			#mapContainer.col.s9
-				#googleMap Lade Karte
+                h4.header Legende
+                form
+                    p.valign-wrapper
+                        img(src='../img/GooglePin-Polizei.png')
+                        span(style="padding-left: 20px") Polizei
+                    p.valign-wrapper
+                        img(src='../img/GooglePin-Feuerwehr.png')
+                        span(style="padding-left: 20px") Feuerwehr
+                    p.valign-wrapper
+                        img(src='../img/GooglePin-Zeitungsartikel.png')
+                        span(style="padding-left: 20px") Zeitungsartikel
+                    p.valign-wrapper
+                        img(src='../img/GooglePin-PoI.png')
+                        span(style="padding-left: 20px") Denkmäler
 
-	#statistik.col.s12
-		.container
-			h3.header Statisitk
-			p Hier werden diverse Charts angezeigt. Lade Daten...
+            #mapContainer.col.s8.m9.l10
+                #googleMap Lade Karte
 
-			.progress
-				.indeterminate
+    #statistik.col.s12
+        .container
+            h3.header Statisitk
+            p Hier werden diverse Charts angezeigt. Lade Daten...
 
-
-			
+            .progress
+                .indeterminate

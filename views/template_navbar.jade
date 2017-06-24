@@ -1,21 +1,23 @@
 doctype html
 html
-	head
-		include layout_head
-		block stylesheets
+    head
+        include layout_head
+        block stylesheets
 
-	body
-		header
-			include layout_header_navbar
+    body
+        header
+            include layout_header_navbar
 
-		main
-			.row
-				block content
+        main
+            .row
+                block content
 
-		footer
-			include layout_footer
+        footer
+            include layout_footer
 
-	script(type='text/javascript' src='https://code.jquery.com/jquery-2.1.1.min.js')
-	script(type='text/javascript' src='/js/materialize.min.js')
-	script(type='text/javascript' src='/js/main.js')
-	block javascript
+    script(type='text/javascript' src='https://code.jquery.com/jquery-2.1.1.min.js')
+    script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js')
+    script(type='text/javascript' src='/js/materialize.min.js')
+    script(type='text/javascript' src='/js/oms.min.js')
+    script(type='text/javascript' src='/js/main.js')
+    block javascript
