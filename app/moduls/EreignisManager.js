@@ -67,6 +67,15 @@ exports.addEreignis = function (ereignis, callback) {
         }).catch(function(error){dbHelper.onError(error);callback()});
 };
 
+exports.getItemContent = function(ereignisId, callback) {
+    db.manyOrNone("SELECT id, titel, shortdescription, adresse, url, zeitpunkt FROM ereignis_content WHERE ereignisid=$1", ereignisId)
+        .then(function (data) {
+            callback(data);
+        }).catch(function (error) {
+            dbHelper.onError(error);
+            callback(undefined);
+        });
+};
 
 var cacheMissCoordsList = [];
 function setUpCoords(eriegnisId, adresse, callback) {

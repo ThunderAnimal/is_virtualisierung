@@ -30,6 +30,16 @@ exports.initData = function (callback) {
     });
 };
 
+exports.getItemContent = function(id, callback) {
+    db.manyOrNone("SELECT id, name FROM denkmal WHERE id=$1", id)
+        .then(function (data) {
+            callback(data);
+        }).catch(function (error) {
+        dbHelper.onError(error);
+        callback(undefined);
+    });
+};
+
 exports.fillData = function (callback) {
     var that = this;
     //Pruefen ob Daten gefuellt, wenn nicht dann einlesen und function ernuet aufrufen
@@ -269,5 +279,4 @@ function calcCentroid(addresses)
 function addToDb(poiObject) {
     db.none("INSERT INTO denkmal(id, typ, name, bezirk, lon, lat) values($1, $2, $3, $4, $5, $6)", poiObject).catch(dbHelper.onError);
 }
-
 
