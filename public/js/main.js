@@ -99,8 +99,6 @@ function loadMarkers(callback) {
     var filterDenkmal = $("#filterDenkmal").is(":checked");
 
     var filterLatest = $("#filterLateest").is(":checked");
-
-    //TODO CALL REST API with Input Parameters
     console.log("LOAD MARKERS:");
     console.log(minLat);
     console.log(maxLat);
@@ -113,55 +111,41 @@ function loadMarkers(callback) {
     console.log(filterDenkmal);
     console.log(filterLatest);
 
-    //DUMMY DATA
-    var markers = [{
-        type: "ZEITUNGSARTIKEL",
-        lat: "52.520000",
-        long:"13.404950",
-        ereignisId: "1"
-    },{
-        type: "ZUSAMMENFASSUNG",
-        lat: "52.450000",
-        long:"13.566667",
-        anzahl: "2300"
-    },{
-        type: "POLIZEI",
-        lat: "52.500000",
-        long:"13.404950",
-        ereignisId: "3"
-    },{
-        type: "FEUERWEHR",
-        lat: "52.500000",
-        long:"13.404950",
-        ereignisId: "4"
-    },{
-        type: "POLIZEI",
-        lat: "52.500000",
-        long:"13.404950",
-        ereignisId: "4"
-    },{
-        type: "Denkmal",
-        lat: "52.510000",
-        long:"13.404950",
-        ereignisId: "4"
-    }];
-
-    //TODO CALL REST API
-    callback(markers);
+    $.get('./rest/markers',
+        {
+            minLat: minLat,
+            maxLat: maxLat,
+            minLon: minLon,
+            maxLon: maxLon,
+            filterPolizei: filterPolizei,
+            filterFeuerwehr: filterFeuerwehr,
+            filterArtikel: filterArtikel,
+            filterDenkmal: filterDenkmal,
+            filterLatest: filterLatest
+        },function (data) {
+            if (!markers){
+                Materialize.toast('Fehler beim laden der Markers', 3000);
+                return;
+            }
+            callback(data.markers);
+        }).fail(function (error) {
+            console.log(error);
+            Materialize.toast('Fehler beim laden der Markers:' + "<br>" + error.statusText + " (" + error.status + ")", 3000);
+    });
 }
 
 function addMarkers(markers) {
     googleOverlappingMarker.removeAllMarkers();
     for (var i = 0; i < markers.length; i++) {
         var lat = parseFloat(markers[i].lat).toFixed(7);
-        var long = parseFloat(markers[i].long).toFixed(7);
+        var lon = parseFloat(markers[i].lon).toFixed(7);
 
-        if (markers[i].type == typEreignis.zusammengefasst) {
-            addMarkerZusammenfassung(markers[i], lat, long);
+        if (markers[i].typ == typEreignis.zusammengefasst) {
+            addMarkerZusammenfassung(markers[i], lat, lon);
             continue;
         }
 
-        switch (markers[i].type) {
+        switch (markers[i].typ) {
             case typEreignis.polizei:
                 var icon = '../img/GooglePin-Polizei.png';
                 break;
@@ -178,38 +162,62 @@ function addMarkers(markers) {
         }
 
         var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(lat, long),
+            position: new google.maps.LatLng(lat, lon),
             icon: icon,
-            ereignisid: markers[i].ereignisId,
-            type: markers[i].type
+            ereignisid: markers[i].id,
+            type: markers[i].typ
         });
 
         google.maps.event.addListener(marker, 'spider_click', function (event) {
             var that = this;
             loadMarkerDetail(that.ereignisid, that.type, function (data) {
-                googleInfoWindow.setContent(getInfoWindowContent(data, that.type));
-                googleInfoWindow.open(googleMap, that);
+                if(data){
+                    if (data.length == 1){
+                        googleInfoWindow.setContent(getInfoWindowContent(data[0], that.type));
+                        googleInfoWindow.open(googleMap, that);
+                    }
+                }
+
             });
         });
         googleOverlappingMarker.addMarker(marker);
     }
 }
 
-function addMarkerZusammenfassung(markerData, lat, long) {
+function addMarkerZusammenfassung(markerData, lat, lon) {
     generateLargeIconNumber(markerData.anzahl, function (icon) {
         var marker = new google.maps.Marker({
-            position:  new google.maps.LatLng(lat, long),
+            position:  new google.maps.LatLng(lat, lon),
             icon: icon,
-            ereignisid: markerData.ereignisId,
-            typ: markerData.typ
+            type: markerData.typ
         });
         googleOverlappingMarker.addMarker(marker);
     });
 }
 
 function loadMarkerDetail(ereignisId, typ, callback) {
-    //TODO call REST API
-    callback();
+    if(typ == typEreignis.ensemble ||
+        typ == typEreignis.denkmal){
+        var uri = './rest/denkmal/';
+    }else{
+        var uri = './rest/ereignis/';
+    }
+
+    $.get(uri + ereignisId,function (data) {
+        if (!data){
+            Materialize.toast('Fehler beim laden des Inhaltes', 3000);
+            return;
+        }
+        if (data.length == 0){
+            Materialize.toast('Fehler beim laden des Inhaltes: <br> ID nicht vorhanden.', 3000);
+            return;
+        }
+
+        callback(data);
+    }).fail(function (error) {
+        console.log(error);
+        Materialize.toast('Fehler beim laden des Inhaltes' + "<br>" + error.statusText + " (" + error.status + ")", 3000);
+    });
 }
 
 function getInfoWindowContent(data, typ) {
@@ -225,23 +233,38 @@ function getInfoWindowContent(data, typ) {
         case typEreignis.denkmal: var img = '../img/poi.png';
             break;
     }
-
-    var formStr =  '<div id="iw-container">' +
-        '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
-            '<div class="card-image">' +
-                '<img src="' + img + '">' +
-            '</div>' +
-            '<div class="card-stacked">' +
-                '<div class="card-content">' +
-                    '<div class="card-title">Mann mit Schreckschusswaffe beschossen und verletzt – Festnahme eines Tatverdächtigen</div>' +
-                    '<div class="card-metadata valign-wrapper"><i class="material-icons">my_location</i>Max Mustermanstarn Strasse <i class="material-icons">today</i>22.05.2014</div> ' +
-                    '<p>Räuber bedrohten Kino-Angestellte und forderten Handys und Geld aus der Kasse. Mit Reizgas und Messern bewaffnet betraten zwei Männer am Dienstagabend gegen 23.30 Uhr ein Kino in der Seestraße in Wedding und forderten von zwei Angestellten Handys und Geld aus der Kasse. </p>' +
+    if (typ == typEreignis.ensemble || typ ==typEreignis.denkmal){
+        var formStr =  '<div id="iw-container">' +
+            '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
+                '<div class="card-image">' +
+                    '<img src="' + img + '">' +
                 '</div>' +
-                '<div class="card-action">' +
-                    '<a href="#">URL zum artikel</a>' +
+                '<div class="card-stacked">' +
+                    '<div class="card-content">' +
+                        '<div class="card-title">' + data.name + '</div>' +
+                    '</div>' +
                 '</div>' +
             '</div>' +
         '</div>';
+    }
+    else{
+        var formStr =  '<div id="iw-container">' +
+            '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
+                '<div class="card-image">' +
+                    '<img src="' + img + '">' +
+                '</div>' +
+                '<div class="card-stacked">' +
+                    '<div class="card-content">' +
+                        '<div class="card-title">' + data.titel + '</div>' +
+                        '<div class="card-metadata valign-wrapper"><i class="material-icons">my_location</i>' + data.adresse +'<i class="material-icons">today</i>' + data.zeitpunkt +'</div> ' +
+                        '<p>' + data.shortdescription +'</p>' +
+                    '</div>' +
+                '<div class="card-action">' +
+                    '<a href="'+ data.url +'" target="_blank">Artikel</a>' +
+                '</div>' +
+            '</div>' +
+            '</div>';
+    }
     return formStr;
 }
 
@@ -254,14 +277,29 @@ function generateLargeIconNumber(number, callback) {
     }
 
     var fontSize = 16,
-        imageWidth = imageHeight = 35;
+        imageWidth = imageHeight = 30;
 
-    if (number >= 1000) {
+    if (number >= 6000) {
         fontSize = 10;
-        imageWidth = imageHeight = 55;
-    } else if (number < 1000 && number > 100) {
+        imageWidth = imageHeight = 70;
+    } else if (number < 1000 && number > 500) {
+        fontSize = 14;
+        imageWidth = imageHeight = 40;
+    } else if (number < 2000 && number >= 1000) {
         fontSize = 14;
         imageWidth = imageHeight = 45;
+    }else if (number < 3000 && number >= 2000) {
+        fontSize = 14;
+        imageWidth = imageHeight = 50;
+    }else if (number < 4000 && number >= 3000) {
+        fontSize = 14;
+        imageWidth = imageHeight = 55;
+    }else if (number < 5000 && number >= 4000) {
+        fontSize = 14;
+        imageWidth = imageHeight = 60;
+    }else if (number < 6000 && number >= 5000) {
+        fontSize = 14;
+        imageWidth = imageHeight = 65;
     }
 
     var svg = d3.select(document.createElement('div')).append('svg')
