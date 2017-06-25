@@ -30,16 +30,6 @@ exports.initData = function (callback) {
     });
 };
 
-exports.getItemContent = function(id, callback) {
-    db.manyOrNone("SELECT id, name FROM denkmal WHERE id=$1", id)
-        .then(function (data) {
-            callback(data);
-        }).catch(function (error) {
-        dbHelper.onError(error);
-        callback(undefined);
-    });
-};
-
 exports.fillData = function (callback) {
     var that = this;
     //Pruefen ob Daten gefuellt, wenn nicht dann einlesen und function ernuet aufrufen
@@ -136,6 +126,8 @@ function getCoords(objGeo, objPois) {
 			if(Array.isArray(streetPoi))
 				{
 					streetPoi= streetPoi[0];
+					streetPoi= streetPoi.replace(/\s/g,'');
+					
 				}		
         
 		//streetPoi=streetPoi.split(':')[0];
@@ -153,6 +145,7 @@ function getCoords(objGeo, objPois) {
 			if(Array.isArray(street))
 				{
 					street= street[0];
+					street= street.replace(/\s/g,'');
 				}
             //street=street.split(':')[0];
             //street= street.replace('{',"");
@@ -164,6 +157,9 @@ function getCoords(objGeo, objPois) {
 
             if (street==streetPoi &&  coords.length==0)
             {
+				
+				
+				
                 var id = objPois[i].id;
                 if(Array.isArray(id))
 				{
@@ -194,7 +190,6 @@ function getCoords(objGeo, objPois) {
 					location= location[0];
 				}
                 poi.push(id),poi.push(typ);poi.push(name);poi.push(lat); poi.push(lon);poi.push(location);
-
                 if (poi[0]!=null &&poi[1]!=null&& poi[2]!=null &&poi[3]!=null&& poi[4]!=null && coords.length==0)
                 {
                     coords.push(poi);
@@ -277,6 +272,13 @@ function calcCentroid(addresses)
 }
 
 function addToDb(poiObject) {
-    db.none("INSERT INTO denkmal(id, typ, name, bezirk, lon, lat) values($1, $2, $3, $4, $5, $6)", poiObject).catch(dbHelper.onError);
+    db.tx(function (t) {
+        var queryPois = t.none("INSERT INTO denkmal(id, typ, name, lon, lat, bezirk) values($1, $2, $3, $4, $5, $6)", poiObject);
+        // returning a promise that determines a successful transaction:
+        return t.batch([queryPois]); // all of the queries are to be resolved;
+    }).then(function (data) {
+        console.log("Denkmal Datenbank erfolgreich gefuellt");
+    }).catch(dbHelper.onError);
 }
+
 
