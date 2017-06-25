@@ -79,7 +79,7 @@ function initializeMap() {
         var iwCloseBtn = iwOuter.next();
 
         // Apply the desired effect to the close button
-        iwCloseBtn.css({opacity: '1', right: '30px', top: '15px'});
+        iwCloseBtn.css({opacity: '1', right: '31px', top: '16px'});
 
     });
 }
@@ -233,9 +233,9 @@ function getInfoWindowContent(data, typ) {
             '</div>' +
             '<div class="card-stacked">' +
                 '<div class="card-content">' +
-                    '<div class="card-title">Title oder Name vom Ereignis</div>' +
+                    '<div class="card-title">Mann mit Schreckschusswaffe beschossen und verletzt – Festnahme eines Tatverdächtigen</div>' +
                     '<div class="card-metadata valign-wrapper"><i class="material-icons">my_location</i>Max Mustermanstarn Strasse <i class="material-icons">today</i>22.05.2014</div> ' +
-                    '<p>I am a very simple card. I am good at containing small bits of information. Hier wird die short description angezeigt</p>' +
+                    '<p>Räuber bedrohten Kino-Angestellte und forderten Handys und Geld aus der Kasse. Mit Reizgas und Messern bewaffnet betraten zwei Männer am Dienstagabend gegen 23.30 Uhr ein Kino in der Seestraße in Wedding und forderten von zwei Angestellten Handys und Geld aus der Kasse. </p>' +
                 '</div>' +
                 '<div class="card-action">' +
                     '<a href="#">URL zum artikel</a>' +

@@ -77,6 +77,8 @@ nav {
     margin-bottom: 0; }
   #iw-container .card-metadata {
     color: gray;
-    margin-bottom: 30px; }
+    margin-bottom: 10px; }
+  #iw-container .card-content {
+    padding-top: 10px; }
 
 /*# sourceMappingURL=style.css.map */
