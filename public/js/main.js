@@ -10,7 +10,10 @@ var typEreignis = {
     feuerwehr: "FEUERWEHR",
     zeitungsartikel: "ZEITUNGSARTIKEL",
     ensemble: "Ensemble",
-    denkmal: "Denkmal"
+    denkmal: "Denkmal",
+    bodendenkmal: "Bodendenkmal",
+    gesamtanalge: "Gesamtanlage"
+
 
 };
 
@@ -123,7 +126,7 @@ function loadMarkers(callback) {
             filterDenkmal: filterDenkmal,
             filterLatest: filterLatest
         },function (data) {
-            if (!markers){
+            if (!data){
                 Materialize.toast('Fehler beim laden der Markers', 3000);
                 return;
             }
@@ -157,6 +160,8 @@ function addMarkers(markers) {
                 break;
             case typEreignis.ensemble:
             case typEreignis.denkmal:
+            case typEreignis.bodendenkmal:
+            case typEreignis.gesamtanalge:
                 var icon = '../img/GooglePin-PoI.png';
                 break;
         }
@@ -197,7 +202,10 @@ function addMarkerZusammenfassung(markerData, lat, lon) {
 
 function loadMarkerDetail(ereignisId, typ, callback) {
     if(typ == typEreignis.ensemble ||
-        typ == typEreignis.denkmal){
+        typ == typEreignis.denkmal ||
+        typ == typEreignis.bodendenkmal ||
+        typ == typEreignis.gesamtanalge
+    ){
         var uri = './rest/denkmal/';
     }else{
         var uri = './rest/ereignis/';
@@ -221,7 +229,6 @@ function loadMarkerDetail(ereignisId, typ, callback) {
 }
 
 function getInfoWindowContent(data, typ) {
-    console.log(typ);
     switch (typ){
         case typEreignis.polizei: var img = '../img/polizei.png';
             break;
@@ -230,10 +237,15 @@ function getInfoWindowContent(data, typ) {
         case typEreignis.zeitungsartikel: var img = '../img/zeitungsartikel.png';
             break;
         case typEreignis.ensemble:
+        case typEreignis.bodendenkmal:
+        case typEreignis.gesamtanalge:
         case typEreignis.denkmal: var img = '../img/poi.png';
             break;
     }
-    if (typ == typEreignis.ensemble || typ ==typEreignis.denkmal){
+    if (typ == typEreignis.ensemble ||
+        typ == typEreignis.denkmal ||
+        typ == typEreignis.bodendenkmal ||
+        typ == typEreignis.gesamtanalge){
         var formStr =  '<div id="iw-container">' +
             '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
                 '<div class="card-image">' +
@@ -242,6 +254,7 @@ function getInfoWindowContent(data, typ) {
                 '<div class="card-stacked">' +
                     '<div class="card-content">' +
                         '<div class="card-title">' + data.name + '</div>' +
+                        '<p>' + typ +'</p>' +
                     '</div>' +
                 '</div>' +
             '</div>' +
