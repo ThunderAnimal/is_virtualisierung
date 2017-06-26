@@ -283,7 +283,7 @@ function calcCentroid(addresses)
 
 function addToDb(poiObject) {
     db.tx(function (t) {
-        var queryPois = t.none("INSERT INTO denkmal(id, typ, name, lon, lat, bezirk) values($1, $2, $3, $4, $5, $6)", poiObject);
+        var queryPois = t.none("INSERT INTO denkmal(id, typ, name,lat,lon, bezirk) values($1, $2, $3, $4, $5, $6)", poiObject);
         // returning a promise that determines a successful transaction:
         return t.batch([queryPois]); // all of the queries are to be resolved;
     }).then(function (data) {
