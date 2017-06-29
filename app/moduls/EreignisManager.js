@@ -67,6 +67,47 @@ exports.addEreignis = function (ereignis, callback) {
         }).catch(function(error){dbHelper.onError(error);callback()});
 };
 
+exports.addCoords = function (callback) {
+    db.any("SELECT ereignis.id, ereignis_content.adresse FROM ereignis_content, ereignis WHERE ereignis_content.ereignisid = ereignis.id AND ereignis.lat IS NULL")
+        .then(function (data) {
+            var rekaddCoords = function (pos) {
+                if (pos >= data.length){
+                    callback();
+                    return;
+                }
+
+                setUpCoords(data[pos].id, data[pos].adresse, function () {
+                    rekaddCoords(pos + 1);
+                });
+            };
+            rekaddCoords(0);
+        })
+        .catch(function (error) {
+           dbHelper.onError(error);
+            callback();
+        });
+};
+
+exports.addSummary = function(callback){
+    db.any("SELECT ereignis_content.id, ereignis.typ FROM ereignis_content, ereignis WHERE ereignis_content.ereignisid = ereignis.id AND (shortdescription IS NULL OR shortdescription = '')")
+        .then(function (data) {
+           var rekaddSummary = function (pos) {
+               if (pos >= data.length){
+                   callback();
+                   return;
+               }
+               setUpSummaryFromApi(data[pos].id, data[pos].typ,  function () {
+                   rekaddSummary(pos + 1);
+               });
+           };
+            rekaddSummary(0);
+        })
+        .catch(function(error){
+            dbHelper.onError(error);
+            callback();
+        });
+};
+
 exports.getItemContent = function(ereignisId, callback) {
     db.manyOrNone("SELECT id, titel, shortdescription, adresse, url, zeitpunkt FROM ereignis_content WHERE ereignisid=$1", ereignisId)
         .then(function (data) {

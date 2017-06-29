@@ -14,7 +14,11 @@ exports.exec = function (callback) {
     var that = this;
     that.fillData(function(){
         that.deletePoIWithoutName(function(){
-            callback();
+            that.addCoords(function () {
+                that.addSummary(function () {
+                    callback();
+                });
+            });
         });
     });
 };
@@ -34,6 +38,14 @@ exports.deletePoIWithoutName = function (callback) {
     //Datenbank durchgehen und pruefen ob name gefuellt, wenn nicht dann Poi loeschen
     console.log("Delete PoI Without Name");
     PoIManager.deleteDataWithputName(callback);
+};
+exports.addCoords = function (callback) {
+    console.log("Add Coords to Ereignis");
+    EreignisManager.addCoords(callback);
+};
+exports.addSummary = function (callback) {
+    console.log("Add Summary to Ereignis");
+    EreignisManager.addSummary(callback);
 };
 
 exports.queryMarkers = function (queryParameters, callback) {
