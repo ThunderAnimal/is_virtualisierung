@@ -252,6 +252,11 @@ exports.queryMarkers = function (queryParameters, callback) {
 function fillDataArticles(callback){
     console.log("Fill Articles:");
     RestManager.getArticlesPages(function(pages){
+        if (!pages){
+            console.error("Fehler bei Abfrage der Artikel Seiten");
+            callback();
+            return;
+        }
         var rekGetArticles = function (currentPage){
             if(currentPage > pages){
                 callback();
@@ -259,6 +264,12 @@ function fillDataArticles(callback){
             }
             console.log("get Articles Page: " + currentPage + "/" + pages);
             RestManager.getArticles(currentPage, function (dataList) {
+                if (!dataList){
+                    console.error("Fehler bei Abfrage der Artikel");
+                    callback();
+                    return;
+                }
+
                 var rekAddEriegnis = function (currentItem) {
                     if (currentItem >= dataList.length){
                         rekGetArticles(currentPage + 1);
@@ -277,6 +288,11 @@ function fillDataArticles(callback){
 function fillDateReports(callback){
     console.log("Fill Reports:");
     RestManager.getReportPages(function(pages){
+        if (!pages){
+            console.error("Fehler bei Abfrage der Reports Seiten");
+            callback();
+            return;
+        }
        var rekGetReports = function(currentPage){
            if(currentPage > pages){
                callback();
@@ -285,6 +301,11 @@ function fillDateReports(callback){
 
            console.log("get Reports Page: " + currentPage + "/" + pages);
            RestManager.getReports(currentPage, function (dataList) {
+               if (!dataList){
+                   console.error("Fehler bei Abfrage der Reports");
+                   callback();
+                   return;
+               }
                var rekAddEriegnis = function (currentItem) {
                    if (currentItem >= dataList.length){
                        rekGetReports(currentPage + 1);
