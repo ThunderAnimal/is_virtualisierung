@@ -8,6 +8,7 @@
     "start": "node ./bin/www",
     "schedule": "node ./bin/schedule",
     "initdb": "node ./bin/initdb",
+      "cleardb": "node ./bin/cleardb",
       "initPois": "node ./bin/poisDbInit"
   },
   "repository": {

@@ -1,0 +1,24 @@
+/**
+ * Created by InSane on 27.06.2017.
+ */
+var db = require("../app/moduls/databaseManager");
+var dbHelper = require("../app/moduls/databaseHelper");
+
+db.tx(function (t) {
+    // creating a sequence of transaction queries:
+    var q1 = t.none('DROP TABLE public.stamm_bezirke');
+    var q2 = t.none('DROP TABLE public.ereignis_content');
+    var q3 = t.none('DROP TABLE public.ereignis');
+    var q4 = t.none('DROP TABLE public.denkmal');
+
+    // returning a promise that determines a successful transaction:
+    return t.batch([ q1,  q2,  q3,  q4]); // all of the queries are to be resolved;
+}).then(function (data) {
+    console.log("Datentabellen erfolgreich geloescht");
+    process.exit(0);
+}).catch(dbHelper.onError);
+
+
+;
+;
+;
