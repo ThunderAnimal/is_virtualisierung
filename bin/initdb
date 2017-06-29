@@ -13,15 +13,15 @@ db.tx(function (t) {
     var q1 = t.none('CREATE TABLE IF NOT EXISTS denkmal (id varchar(255), typ  varchar(255), name varchar(255), bezirk varchar(255), lon float, lat float)');
     var q2 = t.none('CREATE TABLE IF NOT EXISTS ereignis (id varchar(255), typ varchar(255), lon float, lat float)');
     var q3 = t.none('CREATE TABLE IF NOT EXISTS ereignis_content (id varchar(255), titel  varchar(255), description text, shortDescription text, bezirk varchar(255), adresse varchar(255), url text, zeitpunkt timestamp,  EreignisId varchar(255))')
-    var q4 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_denkmal on denkmal (id)');
-    var q5 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_ereignis on ereignis (id)');
-    var q6 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_ereignis_content on ereignis_content (id)');
-    var q7 = t.none('CREATE INDEX IF NOT EXISTS idx_denkmal_geocode on denkmal (lon, lat)');
-    var q8 = t.none('CREATE INDEX IF NOT EXISTS idx_ereignis_geocode on ereignis (lon, lat)');
-    var q9 = t.none('CREATE INDEX IF NOT EXISTS idx_ereignisid on ereignis_content (EreignisId)');
+    var q4 = t.none('CREATE UNIQUE INDEX idx_denkmal on denkmal (id)');
+    var q5 = t.none('CREATE UNIQUE INDEX idx_ereignis on ereignis (id)');
+    var q6 = t.none('CREATE UNIQUE INDEX idx_ereignis_content on ereignis_content (id)');
+    var q7 = t.none('CREATE INDEX idx_denkmal_geocode on denkmal (lon, lat)');
+    var q8 = t.none('CREATE INDEX idx_ereignis_geocode on ereignis (lon, lat)');
+    var q9 = t.none('CREATE INDEX idx_ereignisid on ereignis_content (EreignisId)');
 
     var q10 = t.none('CREATE TABLE IF NOT EXISTS stamm_bezirke (name varchar(255), lon float, lat float )');
-    var q11 = t.none('CREATE UNIQUE INDEX IF NOT EXISTS idx_bezirk on stamm_bezirke (name)');
+    var q11 = t.none('CREATE UNIQUE INDEX idx_bezirk on stamm_bezirke (name)');
 
     // returning a promise that determines a successful transaction:
     return t.batch([ q1,  q2,  q3,  q4,  q5,  q6,  q7,  q8,  q9, q10,  q11]); // all of the queries are to be resolved;
