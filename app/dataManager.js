@@ -282,7 +282,7 @@ function fillDataArticles(callback){
                 rekAddEriegnis(0);
             });
         };
-        rekGetArticles(1);
+        rekGetArticles(0);
     });
 }
 function fillDateReports(callback){

@@ -11,5 +11,8 @@ module.exports = {
     geoCoords:{
         "uri": "http://nominatim.openstreetmap.org/"
     },
+    dubletten:{
+        "uri": "http://cmts4.f4.htw-berlin.de:8080/"
+    }
 
 };

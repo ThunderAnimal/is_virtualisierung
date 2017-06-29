@@ -15,6 +15,18 @@ router.get('/filldata', function(req, res, next) {
         console.log("Verarbeitung beendet!");
     });
 });
+router.get('/fillsummary', function(req, res, next) {
+    res.send('fill Data... i takes a long time');
+    dataManager.addSummary(function () {
+        console.log("Verarbeitung beendet!");
+    });
+});
+router.get('/fillcoords', function(req, res, next) {
+    res.send('fill Data... i takes a long time');
+    dataManager.addCoords(function () {
+        console.log("Verarbeitung beendet!");
+    });
+});
 
 router.get('/markers', function (req, res) {
     dataManager.queryMarkers(req.query, function (markers) {

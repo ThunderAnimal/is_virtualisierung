@@ -8,9 +8,10 @@ var confApi = require('../../config/restApi');
 var clientContent = request.createClient(confApi.content.uri);
 var clientSummary = request.createClient(confApi.summary.uri);
 var clientGeoCoords = request.createClient(confApi.geoCoords.uri);
+var clientDubletten = request.createClient(confApi.dubletten.uri);
 
 exports.getArticles = function(page, callback){
-    clientContent.get('articles?page=' + page, function(err, res, body) {
+    clientDubletten.get('/filteredArticles/page/' + page, function(err, res, body) {
         if (!err && res.statusCode == 200) {
             callback(body);
         } else {
@@ -32,7 +33,7 @@ exports.getReports = function(page, callback){
 };
 
 exports.getArticlesPages = function(callback){
-    clientContent.get('articles_pages/', function(err, res, body) {
+    clientDubletten.get('filteredArticles/pages', function(err, res, body) {
         if (!err && res.statusCode == 200) {
             callback(body.pages);
         }else{
