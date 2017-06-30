@@ -21,10 +21,10 @@ main{
 	background-color: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: $primary-color-light;
+    background-color: #CCC;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #CCC;
+    background-color:  $primary-color-light;
 }
 
 .progress{
@@ -56,6 +56,9 @@ main{
 
 nav{
 	background-color: $primary-color;
+	&.subnav{
+		background-color: $primary-color-light;
+	}
 }
 
 
@@ -84,7 +87,7 @@ nav{
 }
 
 #maps{
-	min-height: calc(100vh - 112px);
+	min-height: calc(100vh - 112px - 64px);
 	padding-right: 0;
 
 	.row{

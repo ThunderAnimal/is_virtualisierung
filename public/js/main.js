@@ -20,14 +20,14 @@ var typEreignis = {
 $(document).ready(function(){
     var script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&key=' + googleApiKey +'&callback=initializeMap';
+    script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&key=' + googleApiKey +'&callback=initializeMap&libraries=places';
     document.body.appendChild(script);
 
     $(".button-collapse").sideNav();
     $('ul.tabs').tabs({ 'swipeable': false });
 
 
-    $('#googleMap').height($( window ).height() - 112);
+    $('#googleMap').height($( window ).height() - 112 - 64);
     $('#filterContainer').height($( window ).height() - 112);
     $('.tabs-content').height($( window ).height() - 112);
 
@@ -54,9 +54,36 @@ function initializeMap() {
         keepSpiderfied: true
     });
 
+    var googleSearchBox = new google.maps.places.SearchBox(document.getElementById('search'));
+
     //using instead of boundce_change, also fired on startup of the map
     google.maps.event.addListener(googleMap, 'idle', function() {
         loadMarkers(addMarkers);
+    });
+
+    googleSearchBox.addListener('places_changed', function() {
+        var places = googleSearchBox.getPlaces();
+
+        if (places.length == 0) {
+            return;
+        }
+
+        // For each place, get the icon, name and location.
+        var bounds = new google.maps.LatLngBounds();
+        places.forEach(function(place) {
+            if (!place.geometry) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+
+            if (place.geometry.viewport) {
+                // Only geocodes have viewport.
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+        });
+        googleMap.fitBounds(bounds);
     });
 
     google.maps.event.addListener(googleInfoWindow, 'domready', function () {
