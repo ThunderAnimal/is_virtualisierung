@@ -25,6 +25,11 @@ $(document).ready(function(){
 
     $(".button-collapse").sideNav();
     $('ul.tabs').tabs({ 'swipeable': false });
+    $('ul.tabs').tabs({onShow: function(tab){
+        if(tab.selector=="#statistik"){
+            initStatisitk();
+        }
+    }});
 
 
     $('#googleMap').height($( window ).height() - 112 - 64);
@@ -35,6 +40,7 @@ $(document).ready(function(){
     $('.filterInput').change(function() {
         loadMarkers(addMarkers);
     });
+
 
 });
 
@@ -112,6 +118,119 @@ function initializeMap() {
         iwCloseBtn.css({opacity: '1', right: '31px', top: '16px'});
 
     });
+}
+
+function initStatisitk(){
+    $('#datatable').hide();
+    $('.chartview').hide();
+    $('.chartloader').show();
+
+    loadStatistikData(function(data){
+        $('.chartloader').hide();
+        $('.chartview').show();
+        Highcharts.chart('container1', {
+            data: {
+                table: 'datatable'
+            },
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text:"<h5 class='header'>Example Chart 1</h5>",
+                useHTML:true
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Units'
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        this.point.y + ' ' + this.point.name.toLowerCase();
+                }
+            }
+        });
+        Highcharts.chart('container2', {
+            data: {
+                table: 'datatable'
+            },
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text:"<h5 class='header'>Example Chart 2</h5>",
+                useHTML:true
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Units'
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        this.point.y + ' ' + this.point.name.toLowerCase();
+                }
+            }
+        });
+        Highcharts.chart('container3', {
+            data: {
+                table: 'datatable'
+            },
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text:"<h5 class='header'>Example Chart</h5>",
+                useHTML:true
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Units'
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        this.point.y + ' ' + this.point.name.toLowerCase();
+                }
+            }
+        });
+        Highcharts.chart('container4', {
+            data: {
+                table: 'datatable'
+            },
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text:"<h5 class='header'>Example Chart 4</h5>",
+                useHTML:true
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Units'
+                }
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        this.point.y + ' ' + this.point.name.toLowerCase();
+                }
+            }
+        });
+    });
+
+}
+
+function loadStatistikData(callback){
+    //TODO call REST API
+    setTimeout(callback, 1500);
 }
 
 function loadMarkers(callback) {
@@ -391,9 +510,3 @@ function generateLargeIconNumber(number, callback) {
             return String.fromCharCode('0x' + p1);
         }));
 }
-
-	   
-
-
-
-	  
