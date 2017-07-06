@@ -182,16 +182,29 @@ exports.queryMarkers = function (queryParameters, callback) {
         .then(function (data) {
             //huge date --> group
             if (data[0].count > maxMarkers){
-                db.any(groupQuery, queryInput)
-                    .then(function (data) {
-                        func_fillZusammfassung(data,  function (markers) {
-                            callback(markers);
-                        });
-                    })
-                    .catch(function (error) {
-                        dbHelper.onError(error);
-                        callback(undefined);
+                //Pruefen wie weit rausgezommt, wenn zu weit dann dann nru ein Marker
+                if ((queryParameters.minLat < 52 && queryParameters.maxLat > 53) ||
+                    (queryParameters.minLon < 12 && queryParameters.maxLon > 14.5)){
+                    var marker = [];
+                    marker.push({
+                        typ: "ZUSAMMENFASSUNG",
+                        lat: "52.520007",
+                        lon: "13.404953999999975",
+                        anzahl: data[0].count
                     });
+                    callback(marker);
+                }else {
+                    db.any(groupQuery, queryInput)
+                        .then(function (data) {
+                            func_fillZusammfassung(data, function (markers) {
+                                callback(markers);
+                            });
+                        })
+                        .catch(function (error) {
+                            dbHelper.onError(error);
+                            callback(undefined);
+                        });
+                }
             }else{
                 db.any(basicQuery, queryInput)
                     .then(function (data) {
