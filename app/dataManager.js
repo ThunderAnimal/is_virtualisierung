@@ -51,7 +51,8 @@ exports.addSummary = function (callback) {
 exports.queryMarkers = function (queryParameters, callback) {
     //Parameters
     var maxMarkers = 2500;
-
+    var currentYear = " '2017-01-01 00:00:00.000000' ";
+    var queryTyps = [];
 
     //gloab functions
     var func_fillZusammfassung = function(data, callback){
@@ -84,11 +85,23 @@ exports.queryMarkers = function (queryParameters, callback) {
     queryParameters.filterFeuerwehr = (queryParameters.filterFeuerwehr == 'true');
     queryParameters.filterArtikel = (queryParameters.filterArtikel == 'true');
     queryParameters.filterLatest = (queryParameters.filterLatest == 'true');
+
+    //QueryBilder Params
+    var countQuery = "";
+    var groupQuery = "";
+    var basicQuery = "";
+    var queryInput = [];
+    if (queryParameters.filterLatest){
+        var queryLatest = " AND zeitpunkt  >= " + currentYear;
+    }else{
+        var queryLatest = "";
+    }
+
+
+
     //UNION SQL uber Denkmal und erigenis
-    
     if (queryParameters.filterDenkmal &&
         (queryParameters.filterPolizei || queryParameters.filterFeuerwehr || queryParameters.filterArtikel)) {
-        var queryTyps = []
         if(queryParameters.filterPolizei){
             queryTyps.push("POLIZEI");
         }
@@ -98,40 +111,89 @@ exports.queryMarkers = function (queryParameters, callback) {
         if (queryParameters.filterArtikel){
             queryTyps.push("ZEITUNGSARTIKEL");
         }
-        db.any("SELECT count(*) FROM ( " +
-            "SELECT id " +
-            "FROM denkmal " +
+
+        countQuery = "SELECT count(*) FROM ( " +
+            "SELECT denkmal.id FROM denkmal " +
             "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
             "UNION ALL " +
-            "SELECT id " +
-            "FROM ereignis " +
-            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv) " +
-            ") as count", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps])
-            .then(function (data) {
-                if (data[0].count > maxMarkers){
-                    db.any("SELECT bezirk, count(*) FROM ( " +
-                        "SELECT denkmal.bezirk " +
-                        "FROM denkmal WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
-                        "UNION ALL " +
-                        "SELECT ereignis_content.bezirk " +
-                        "FROM ereignis_content, ereignis  WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv) " +
-                        ") as count " +
-                        "GROUP BY bezirk", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps])
-                        .then(function (data) {
-                            func_fillZusammfassung(data,  function (markers) {
-                                callback(markers);
-                            });
-                        })
-                        .catch(function (error) {
-                            dbHelper.onError(error);
-                            callback(undefined);
+            "SELECT ereignis.id FROM ereignis_content, ereignis " +
+            "WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv)" + queryLatest  +
+            ") as count";
+        groupQuery = "SELECT bezirk, count(*) FROM ( " +
+            "SELECT denkmal.bezirk FROM denkmal " +
+            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
+            "UNION ALL " +
+            "SELECT ereignis_content.bezirk FROM ereignis_content, ereignis " +
+            "WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv)" + queryLatest +
+            ") as count GROUP BY bezirk";
+        basicQuery = "SELECT id, lon, lat, typ FROM denkmal " +
+            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
+            "UNION ALL " +
+            "SELECT ereignis.id, lon, lat, typ FROM ereignis_content, ereignis " +
+            "WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv)" + queryLatest;
+        queryInput = [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps];
+    } else if (queryParameters.filterDenkmal && //SQL nur uber Denkmal Tabelle --> Improve Performance
+        !(queryParameters.filterPolizei || queryParameters.filterFeuerwehr || queryParameters.filterArtikel)) {
+
+        countQuery = "SELECT count(*) FROM ( " +
+            "SELECT id FROM denkmal " +
+            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
+            ") as count";
+        groupQuery = "SELECT bezirk, count(*) FROM ( " +
+            "SELECT denkmal.bezirk FROM denkmal " +
+            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
+            ") as count GROUP BY bezirk";
+        basicQuery = "SELECT id, lon, lat, typ FROM denkmal " +
+            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4";
+        queryInput = [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat];
+
+
+    } else if (!queryParameters.filterDenkmal && //SQL nur Ueber ereignis Tabelle --> Improve Performance
+        (queryParameters.filterPolizei || queryParameters.filterFeuerwehr || queryParameters.filterArtikel)) {
+        if(queryParameters.filterPolizei){
+            queryTyps.push("POLIZEI");
+        }
+        if (queryParameters.filterFeuerwehr){
+            queryTyps.push("FEUERWEHR");
+        }
+        if (queryParameters.filterArtikel){
+            queryTyps.push("ZEITUNGSARTIKEL");
+        }
+
+        countQuery = "SELECT count(*) FROM ( " +
+            "SELECT ereignis.id FROM ereignis_content, ereignis  " +
+            "WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv) " + queryLatest +
+            ") as count";
+        groupQuery = "SELECT bezirk, count(*) FROM ( " +
+            "SELECT ereignis_content.bezirk FROM ereignis_content, ereignis  " +
+            "WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv) " + queryLatest +
+            ") as count GROUP BY bezirk";
+        basicQuery = "SELECT ereignis.id, lon, lat, typ FROM ereignis_content, ereignis " +
+            "WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv)" + queryLatest;
+
+        queryInput = [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps];
+    }else{ //Nichts angehakt leere Liste
+        callback([]);
+        return;
+    }
+
+    //Query Daten
+    db.any(countQuery,queryInput)
+        .then(function (data) {
+            //huge date --> group
+            if (data[0].count > maxMarkers){
+                db.any(groupQuery, queryInput)
+                    .then(function (data) {
+                        func_fillZusammfassung(data,  function (markers) {
+                            callback(markers);
                         });
-                }else{
-                    db.any("SELECT id, lon, lat, typ " +
-                        "FROM denkmal WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
-                        "UNION ALL " +
-                        "SELECT id, lon, lat, typ " +
-                        "FROM ereignis WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv)", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps])
+                    })
+                    .catch(function (error) {
+                        dbHelper.onError(error);
+                        callback(undefined);
+                    });
+            }else{
+                db.any(basicQuery, queryInput)
                     .then(function (data) {
                         callback(data);
                     })
@@ -139,114 +201,12 @@ exports.queryMarkers = function (queryParameters, callback) {
                         dbHelper.onError(error);
                         callback(undefined);
                     });
-                }
-            })
-            .catch(function (error) {
-                dbHelper.onError(error);
-                callback(undefined);
-            });
-
-
-        //SQL nur uber Denkmal Tabelle
-    } else if (queryParameters.filterDenkmal &&
-        !(queryParameters.filterPolizei || queryParameters.filterFeuerwehr || queryParameters.filterArtikel)) {
-        
-        db.any("SELECT count(*) FROM ( " +
-            "SELECT id " +
-            "FROM denkmal " +
-            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
-            ") as count", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat])
-            .then(function (data) {
-                if (data[0].count > maxMarkers){
-                    db.any("SELECT bezirk, count(*) FROM ( " +
-                        "SELECT denkmal.bezirk " +
-                        "FROM denkmal WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 " +
-                        ") as count " +
-                        "GROUP BY bezirk", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat])
-                        .then(function (data) {
-                            func_fillZusammfassung(data,  function (markers) {
-                                callback(markers);
-                            });
-                        })
-                        .catch(function (error) {
-                            dbHelper.onError(error);
-                            callback(undefined);
-                        });
-                }else{
-                    db.any("SELECT id, lon, lat, typ " +
-                        "FROM denkmal WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 ", 
-                        [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat])
-                        .then(function (data) {
-                            callback(data);
-                        })
-                        .catch(function (error) {
-                            dbHelper.onError(error);
-                            callback(undefined);
-                        });
-                }
-            })
-            .catch(function (error) {
-                dbHelper.onError(error);
-                callback(undefined);
-            });
-        
-        //SQL nur Ueber ereignis Tabelle
-    } else if (!queryParameters.filterDenkmal &&
-        (queryParameters.filterPolizei || queryParameters.filterFeuerwehr || queryParameters.filterArtikel)) {
-        var queryTyps = [];
-        if(queryParameters.filterPolizei){
-            queryTyps.push("POLIZEI");
-        }
-        if (queryParameters.filterFeuerwehr){
-            queryTyps.push("FEUERWEHR");
-        }
-        if (queryParameters.filterArtikel){
-            queryTyps.push("ZEITUNGSARTIKEL");
-        }
-        db.any("SELECT count(*) FROM ( " +
-            "SELECT id " +
-            "FROM ereignis " +
-            "WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv) " +
-            ") as count", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps])
-            .then(function (data) {
-                if (data[0].count > maxMarkers){
-                    db.any("SELECT bezirk, count(*) FROM ( " +
-                        "SELECT ereignis_content.bezirk " +
-                        "FROM ereignis_content, ereignis  WHERE ereignis_content.ereignisid=ereignis.id AND lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv) " +
-                        ") as count " +
-                        "GROUP BY bezirk", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps])
-                        .then(function (data) {
-                            func_fillZusammfassung(data,  function (markers) {
-                                callback(markers);
-                            });
-                        })
-                        .catch(function (error) {
-                            dbHelper.onError(error);
-                            callback(undefined);
-                        });
-                }else{
-                    db.any("SELECT id, lon, lat, typ " +
-                        "FROM ereignis WHERE lon>=$1 AND lon<=$2 AND lat>=$3 AND lat<=$4 AND typ in($5:csv)", [queryParameters.minLon, queryParameters.maxLon, queryParameters.minLat, queryParameters.maxLat, queryTyps])
-                        .then(function (data) {
-                            callback(data);
-                        })
-                        .catch(function (error) {
-                            dbHelper.onError(error);
-                            callback(undefined);
-                        });
-                }
-            })
-            .catch(function (error) {
-                dbHelper.onError(error);
-                callback(undefined);
-            });
-
-        //Nichts angehakt leere Liste
-    }else{
-        callback([])
-    }
-
-
+            }
+        })
+        .catch(function (error) {
+            dbHelper.onError(error);
+            callback(undefined);
+        });
 };
 
 function fillDataArticles(callback){
