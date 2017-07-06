@@ -2,7 +2,6 @@ var googleApiKey = "AIzaSyDokUDCoq4oDQbX_s_-U7BXr2OwhQQND0I";
 
 var googleMap = {};
 var googleOverlappingMarker = {};
-var googleInfoWindow = {};
 
 var typEreignis = {
     zusammengefasst: "ZUSAMMENFASSUNG",
@@ -30,6 +29,7 @@ $(document).ready(function(){
             initStatisitk();
         }
     }});
+    $('.modal').modal();
 
     //TRIGGER EVENTS
     $('.filterInput').change(function() {
@@ -53,8 +53,6 @@ function initializeMap() {
         scrollwheel: true,
         zoom: 12
     });
-
-    googleInfoWindow = new google.maps.InfoWindow();
 
     googleOverlappingMarker = new OverlappingMarkerSpiderfier(googleMap, {
         markersWontMove: true,
@@ -315,10 +313,8 @@ function addMarkers(markers) {
             var that = this;
             loadMarkerDetail(that.ereignisid, that.type, function (data) {
                 if(data){
-                    if (data.length == 1){
-                        googleInfoWindow.setContent(getInfoWindowContent(data[0], that.type));
-                        googleInfoWindow.open(googleMap, that);
-                    }
+                    $('#modalInfoContent .modal-content').empty().html(getModalInfoContent(data, that.type));
+                    $('#modalInfoContent').modal('open');
                 }
 
             });
@@ -366,57 +362,78 @@ function loadMarkerDetail(ereignisId, typ, callback) {
     });
 }
 
-function getInfoWindowContent(data, typ) {
-    switch (typ){
-        case typEreignis.polizei: var img = '../img/polizei.png';
-            break;
-        case typEreignis.feuerwehr: var img = '../img/feuerwehr.png';
-            break;
-        case typEreignis.zeitungsartikel: var img = '../img/zeitungsartikel.png';
-            break;
-        case typEreignis.ensemble:
-        case typEreignis.bodendenkmal:
-        case typEreignis.gesamtanalge:
-        case typEreignis.denkmal: var img = '../img/poi.png';
-            break;
-    }
+function getModalInfoContent(data, typ){
+    var func_getCardContent = function (dataItem) {
+        switch (typ){
+            case typEreignis.polizei: var img = '../img/polizei.png';
+                break;
+            case typEreignis.feuerwehr: var img = '../img/feuerwehr.png';
+                break;
+            case typEreignis.zeitungsartikel: var img = '../img/zeitungsartikel.png';
+                break;
+            case typEreignis.ensemble:
+            case typEreignis.bodendenkmal:
+            case typEreignis.gesamtanalge:
+            case typEreignis.denkmal: var img = '../img/poi.png';
+                break;
+        }
+
+        var formStr = "";
+        if (typ == typEreignis.ensemble ||
+            typ == typEreignis.denkmal ||
+            typ == typEreignis.bodendenkmal ||
+            typ == typEreignis.gesamtanalge){
+            console.log(dataItem)
+            formStr =
+                '<div class="card horizontal">' +
+                    '<div class="card-image">' +
+                        '<img src="' + img + '">' +
+                    '</div>' +
+                    '<div class="card-stacked">' +
+                        '<div class="card-content">' +
+                            '<div class="card-title">' + dataItem.name + '</div>' +
+                            '<p class=""">' + typ +'</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+        }
+        else{
+            var time = new Date(dataItem.zeitpunkt);
+            var timeFormatted = time.getDate() + "." + (time.getMonth() + 1) + "." + time.getFullYear() + ' ' + time.getHours() + ':' + time.getMinutes();
+            formStr =
+                '<div class="card horizontal">' +
+                    '<div class="card-image">' +
+                        '<img src="' + img + '">' +
+                    '</div>' +
+                    '<div class="card-stacked">' +
+                        '<div class="card-content">' +
+                            '<div class="card-title">' + dataItem.titel + '</div>' +
+                            '<div class="grey-text valign-wrapper" style="padding-bottom: 10px"><i class="material-icons">today</i>' + timeFormatted +'</div> ' +
+                            '<p class="">' + dataItem.shortdescription +'</p>' +
+                        '</div>' +
+                        '<div class="card-action">' +
+                            '<a href="'+ dataItem.url +'" target="_blank">zum Artikel</a>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+        }
+        return formStr;
+    };
     if (typ == typEreignis.ensemble ||
         typ == typEreignis.denkmal ||
         typ == typEreignis.bodendenkmal ||
-        typ == typEreignis.gesamtanalge){
-        var formStr =  '<div id="iw-container">' +
-            '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
-                '<div class="card-image">' +
-                    '<img src="' + img + '">' +
-                '</div>' +
-                '<div class="card-stacked">' +
-                    '<div class="card-content">' +
-                        '<div class="card-title">' + data.name + '</div>' +
-                        '<p>' + typ +'</p>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
+        typ == typEreignis.gesamtanalge) {
+        var html = "";
+    }else{
+        var html  = '<h5 class="header"><i class="material-icons" style="padding-right: 20px">my_location</i>' + data[0].adresse +'</h5>';
     }
-    else{
-        var formStr =  '<div id="iw-container">' +
-            '<div class="card horizontal" style="margin:0;box-shadow: 0">' +
-                '<div class="card-image">' +
-                    '<img src="' + img + '">' +
-                '</div>' +
-                '<div class="card-stacked">' +
-                    '<div class="card-content">' +
-                        '<div class="card-title">' + data.titel + '</div>' +
-                        '<div class="card-metadata valign-wrapper"><i class="material-icons">my_location</i>' + data.adresse +'<i class="material-icons">today</i>' + data.zeitpunkt +'</div> ' +
-                        '<p>' + data.shortdescription +'</p>' +
-                    '</div>' +
-                '<div class="card-action">' +
-                    '<a href="'+ data.url +'" target="_blank">Artikel</a>' +
-                '</div>' +
-            '</div>' +
-            '</div>';
+
+    html += '<div class="row"><div class="col s12">';
+    for(var i = 0; i < data.length; i++){
+        html += func_getCardContent(data[0]);
     }
-    return formStr;
+    html += '</div></div>';
+    return html;
 }
 
 //Alternative Option for Standard Marker
