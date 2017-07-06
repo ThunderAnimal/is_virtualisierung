@@ -44,4 +44,9 @@ router.get('/denkmal/:id', function (req, res) {
        res.send(data);
     });
 });
+router.get('/statistic', function (req, res) {
+    dataManager.getStatistic(function (data) {
+        res.send(data);
+    })
+});
 module.exports = router;

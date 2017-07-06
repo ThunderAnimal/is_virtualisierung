@@ -222,6 +222,136 @@ exports.queryMarkers = function (queryParameters, callback) {
         });
 };
 
+exports.getStatistic = function (callback) {
+    //gloab functions
+    var func_getPoiBezirk = function (callback) {
+        db.any("SELECT bezirk, typ, count(*) FROM ( " +
+            "SELECT denkmal.bezirk, denkmal.typ FROM denkmal " +
+            ") as count GROUP BY bezirk, typ ORDER BY bezirk, typ")
+            .then(function (data) {
+                BezirkManager.getBezirkCoorList(function (bezirkListe) {
+                    statistic.poiBezirke = {};
+                    var categories = [];
+                    for (var i = 0; i < bezirkListe.length; i++){
+                        categories.push(bezirkListe[i].name);
+                    }
+                    var series = [
+                        {name: 'Bodendenkmal', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Denkmal', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Ensemble', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Gesamtanlage', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Gesamt', data:[0,0,0,0,0,0,0,0,0,0,0,0]}
+                    ];
+                    for (var i= 0; i < data.length; i++){
+                        //serie raussuchen
+                        for (var k =0; k < series.length; k++){
+                            if (data[i].typ == series[k].name){
+                                //Bezirk raussuchen, id in data bei seroe
+                                for(var j = 0; j < categories.length; j++){
+                                    if (data[i].bezirk == categories[j]){
+                                        series[k].data[j] = parseInt(data[i].count); //Wert in data serie setzten
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    for(var i = 0; i < categories.length; i++){
+                        series[4].data[i] = series[0].data[i] + series[1].data[i] + series[2].data[i] + series[3].data[i];
+                    }
+
+                    statistic.poiBezirke.categories = categories;
+                    statistic.poiBezirke.series = series;
+                    callback();
+                });
+
+            });
+    };
+    var func_getReportsArticleBezirke = function (callback) {
+        db.any("SELECT bezirk, typ, count(*) FROM ( " +
+            "SELECT ereignis_content.bezirk, ereignis.typ FROM ereignis_content, ereignis  " +
+            "WHERE ereignis_content.ereignisid=ereignis.id " +
+            ") as count GROUP BY bezirk, typ ORDER BY bezirk, typ")
+            .then(function (data) {
+                BezirkManager.getBezirkCoorList(function (bezirkListe) {
+                    statistic.reportsArticleBezirke = {};
+                    var categories = [];
+                    for (var i = 0; i < bezirkListe.length; i++){
+                        categories.push(bezirkListe[i].name);
+                    }
+                    var series = [
+                        {name: 'Polizei', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Feuerwehr', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Zeitungsartikel', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Gesamt', data:[0,0,0,0,0,0,0,0,0,0,0,0]}
+                    ];
+                    for (var i= 0; i < data.length; i++){
+                        //serie raussuchen
+                        for (var k =0; k < series.length; k++){
+                            if (data[i].typ.toLocaleLowerCase() == series[k].name.toLocaleLowerCase()){
+                                //Bezirk raussuchen, id in data bei seroe
+                                for(var j = 0; j < categories.length; j++){
+                                    if (data[i].bezirk == categories[j]){
+                                        series[k].data[j] = parseInt(data[i].count); //Wert in data serie setzten
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    for(var i = 0; i < categories.length; i++){
+                        series[3].data[i] = series[0].data[i] + series[1].data[i] + series[2].data[i];
+                    }
+
+                    statistic.reportsArticleBezirke.categories = categories;
+                    statistic.reportsArticleBezirke.series = series;
+                    callback();
+                });
+
+            });
+    };
+    var func_getTimeline = function (callback) {
+        db.any("SELECT typ, " +
+            "EXTRACT(year FROM zeitpunkt) as year, " +
+            "EXTRACT(month FROM zeitpunkt) as month, " +
+            "count(*) FROM ( " +
+            "SELECT ereignis.typ, ereignis_content.zeitpunkt FROM ereignis_content, ereignis  " +
+            "WHERE ereignis_content.ereignisid=ereignis.id " +
+            ") as count GROUP BY typ, year, month ORDER BY typ,  year ASC, month ASC")
+            .then(function (data) {
+                statistic.reportsArticleTime = {};
+                var series = [
+                    {name: 'Polizei', data:[]},
+                    {name: 'Feuerwehr', data:[]},
+                    {name: 'Zeitungsartikel', data:[]}
+                ];
+                for (var i = 0; i <data.length; i ++){
+                    for (var k = 0; k<series.length; k++){
+                        if (data[i].typ.toLocaleLowerCase() == series[k].name.toLocaleLowerCase()){
+                            series[k].data.push([Date.UTC(parseInt(data[i].year), parseInt(data[i].month) - 1, 31), parseInt(data[i].count)]);
+                        }
+                    }
+                }
+                statistic.reportsArticleTime.series = series;
+                callback();
+            });
+    };
+
+    var statistic = {};
+    func_getPoiBezirk(function (){
+        func_getReportsArticleBezirke(function () {
+            func_getTimeline(function () {
+                callback(statistic);
+            });
+        })
+    });
+
+
+
+};
+
 function fillDataArticles(callback){
     console.log("Fill Articles:");
     RestManager.getArticlesPages(function(pages){

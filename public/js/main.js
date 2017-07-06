@@ -92,33 +92,6 @@ function initializeMap() {
         });
         googleMap.fitBounds(bounds);
     });
-
-    google.maps.event.addListener(googleInfoWindow, 'domready', function () {
-        // Reference to the DIV that wraps the bottom of infowindow
-        var iwOuter = $('.gm-style-iw');
-
-        /* Since this div is in a position prior to .gm-div style-iw.
-         * We use jQuery and create a iwBackground variable,
-         * and took advantage of the existing reference .gm-style-iw for the previous div with .prev().
-         */
-        var iwBackground = iwOuter.prev();
-
-        // Removes background shadow DIV
-        iwBackground.children(':nth-child(2)').css({'display' : 'none'});
-
-        // Removes white background DIV
-        iwBackground.children(':nth-child(4)').css({'display' : 'none'});
-
-        // Changes the desired tail shadow color.
-        iwBackground.children(':nth-child(3)').find('div').children().css({'box-shadow': 'rgba(0,0,0,0.12) 0px 1px 6px', 'z-index' : '1'});
-
-        // Reference to the div that groups the close button elements.
-        var iwCloseBtn = iwOuter.next();
-
-        // Apply the desired effect to the close button
-        iwCloseBtn.css({opacity: '1', right: '31px', top: '16px'});
-
-    });
 }
 
 function initStatisitk(){
@@ -130,108 +103,103 @@ function initStatisitk(){
         $('.chartloader').hide();
         $('.chartview').show();
         Highcharts.chart('container1', {
-            data: {
-                table: 'datatable'
-            },
             chart: {
                 type: 'column'
             },
             title: {
-                text:"<h5 class='header'>Example Chart 1</h5>",
+                text:"<h5 class='header'>Denkmal nach Bezirke</h5>",
                 useHTML:true
             },
+            xAxis:{
+                categories: data.poiBezirke.categories
+            },
             yAxis: {
-                allowDecimals: false,
+                min: 0,
                 title: {
-                    text: 'Units'
+                    text: 'Anzahl'
                 }
             },
+            series: data.poiBezirke.series,
             tooltip: {
                 formatter: function () {
                     return '<b>' + this.series.name + '</b><br/>' +
-                        this.point.y + ' ' + this.point.name.toLowerCase();
+                        this.point.y;
                 }
             }
         });
         Highcharts.chart('container2', {
-            data: {
-                table: 'datatable'
-            },
             chart: {
                 type: 'column'
             },
             title: {
-                text:"<h5 class='header'>Example Chart 2</h5>",
+                text:"<h5 class='header'>Artikel/Reports nach Bezirke</h5>",
                 useHTML:true
             },
+            xAxis:{
+                categories: data.reportsArticleBezirke.categories
+            },
             yAxis: {
-                allowDecimals: false,
+                min: 0,
                 title: {
-                    text: 'Units'
+                    text: 'Anzahl'
                 }
             },
+            series: data.reportsArticleBezirke.series,
             tooltip: {
                 formatter: function () {
                     return '<b>' + this.series.name + '</b><br/>' +
-                        this.point.y + ' ' + this.point.name.toLowerCase();
+                        this.point.y;
                 }
             }
         });
         Highcharts.chart('container3', {
-            data: {
-                table: 'datatable'
-            },
             chart: {
-                type: 'column'
+                type: 'areaspline'
             },
             title: {
-                text:"<h5 class='header'>Example Chart</h5>",
+                text:"<h5 class='header'>Artikel/Reports Timeline</h5>",
                 useHTML:true
             },
-            yAxis: {
-                allowDecimals: false,
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    month: '%b \'%y',
+                    year: '%Y'
+                },
                 title: {
-                    text: 'Units'
+                    text: 'Datum'
                 }
-            },
-            tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + '</b><br/>' +
-                        this.point.y + ' ' + this.point.name.toLowerCase();
-                }
-            }
-        });
-        Highcharts.chart('container4', {
-            data: {
-                table: 'datatable'
-            },
-            chart: {
-                type: 'column'
-            },
-            title: {
-                text:"<h5 class='header'>Example Chart 4</h5>",
-                useHTML:true
             },
             yAxis: {
-                allowDecimals: false,
                 title: {
-                    text: 'Units'
-                }
+                    text: 'Anzahl'
+                },
+                min: 0
             },
             tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + '</b><br/>' +
-                        this.point.y + ' ' + this.point.name.toLowerCase();
+                headerFormat: '<b>{series.name}</b><br>',
+                pointFormat: '{point.x:%e. %b}: {point.y}'
+            },
+
+            plotOptions: {
+                spline: {
+                    marker: {
+                        enabled: true
+                    }
                 }
-            }
+            },
+
+            series: data.reportsArticleTime.series
         });
     });
 
 }
 
 function loadStatistikData(callback){
-    //TODO call REST API
-    setTimeout(callback, 1500);
+    $.get('./rest/statistic',function (data) {
+        callback(data);
+    });
+
 }
 
 function loadMarkers(callback) {
