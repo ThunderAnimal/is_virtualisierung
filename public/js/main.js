@@ -31,18 +31,21 @@ $(document).ready(function(){
         }
     }});
 
-
-    $('#googleMap').height($( window ).height() - 112 - 64);
-    $('#filterContainer').height($( window ).height() - 112);
-    $('.tabs-content').height($( window ).height() - 112);
-
     //TRIGGER EVENTS
     $('.filterInput').change(function() {
         loadMarkers(addMarkers);
     });
 
-
+    $(window).resize(function () {
+        rezieUI();
+    });
+    rezieUI();
 });
+function rezieUI() {
+    $('#googleMap').height($( window ).height() - 112 - 64);
+    $('#filterContainer').height($( window ).height() - 112);
+    $('.tabs-content').height($( window ).height() - 112);
+}
 
 function initializeMap() {
     googleMap = new google.maps.Map(document.getElementById('googleMap'), {
@@ -248,17 +251,6 @@ function loadMarkers(callback) {
     var filterDenkmal = $("#filterDenkmal").is(":checked");
 
     var filterLatest = $("#filterLateest").is(":checked");
-    console.log("LOAD MARKERS:");
-    console.log(minLat);
-    console.log(maxLat);
-    console.log(minLon);
-    console.log(maxLon);
-
-    console.log(filterPolizei);
-    console.log(filterFeuerwehr);
-    console.log(filterArtikel);
-    console.log(filterDenkmal);
-    console.log(filterLatest);
 
     $.get('./rest/markers',
         {
