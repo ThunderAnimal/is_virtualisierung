@@ -8,7 +8,17 @@ var calcCoords = require("../moduls/calcCoords");
 var RestApi = require("./restApiManager");
 var uuid = require("uuid");
 
-exports.addEreignis = function (ereignis, callback) {
+exports.addReport = function (report, callback) {
+    addEreignis(report, callback);
+};
+exports.addArticle = function (article, callback) {
+    if (article.ereigniszeitpunkt == "" || article.ereigniszeitpunkt == undefined){
+        article.ereigniszeitpunkt = article.meldungszeitpunkt;
+    }
+    addEreignis(article, callback);
+};
+
+function addEreignis (ereignis, callback) {
     //Ereignisse ohne Adresse nicht Aufnehmen
     if (ereignis.adresse == ""){
         callback();
@@ -22,7 +32,7 @@ exports.addEreignis = function (ereignis, callback) {
 
     var func_createContent = function (){
         db.none("INSERT INTO ereignis_content(id, titel, description, bezirk, adresse, url, zeitpunkt, ereignisid) " +
-            "VALUES(${id}, ${titel}, ${inhalt}, ${bezirk}, ${adresse}, ${url}, ${meldungszeitpunkt}, ${ownId})", ereignis)
+            "VALUES(${id}, ${titel}, ${inhalt}, ${bezirk}, ${adresse}, ${url}, ${ereigniszeitpunkt}, ${ownId})", ereignis)
             .then(function (data) {
                 setUpCoords(ereignis.ownId, ereignis.adresse, function () {
                     setUpSummaryFromApi(ereignis.id, ereignis.kategorie, function () {

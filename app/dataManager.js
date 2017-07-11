@@ -378,7 +378,7 @@ function fillDataArticles(callback){
                         rekGetArticles(currentPage + 1);
                         return;
                     }
-                    EreignisManager.addEreignis(dataList[currentItem], function () {
+                    EreignisManager.addArticle(dataList[currentItem], function () {
                         rekAddEriegnis(currentItem + 1);
                     });
                 };
@@ -414,7 +414,7 @@ function fillDateReports(callback){
                        rekGetReports(currentPage + 1);
                        return;
                    }
-                   EreignisManager.addEreignis(dataList[currentItem], function () {
+                   EreignisManager.addReport(dataList[currentItem], function () {
                        rekAddEriegnis(currentItem + 1);
                    });
                };
