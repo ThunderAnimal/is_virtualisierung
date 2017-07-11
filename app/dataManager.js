@@ -223,6 +223,12 @@ exports.queryMarkers = function (queryParameters, callback) {
 };
 
 exports.getStatistic = function (callback) {
+    var colorPolizei = "#6e9d74";
+    var colorFeuerwehr = "#b33e67";
+    var colorZeitung = "#f1a646";
+    var colorGesamt = "#444444";
+    var colorDenkmalGesamt = "#5f8ce9";
+
     //gloab functions
     var func_getPoiBezirk = function (callback) {
         db.any("SELECT bezirk, typ, count(*) FROM ( " +
@@ -240,7 +246,7 @@ exports.getStatistic = function (callback) {
                         {name: 'Denkmal', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
                         {name: 'Ensemble', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
                         {name: 'Gesamtanlage', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
-                        {name: 'Gesamt', data:[0,0,0,0,0,0,0,0,0,0,0,0]}
+                        {name: 'Gesamt', color: colorDenkmalGesamt, data:[0,0,0,0,0,0,0,0,0,0,0,0]}
                     ];
                     for (var i= 0; i < data.length; i++){
                         //serie raussuchen
@@ -281,10 +287,10 @@ exports.getStatistic = function (callback) {
                         categories.push(bezirkListe[i].name);
                     }
                     var series = [
-                        {name: 'Polizei', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
-                        {name: 'Feuerwehr', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
-                        {name: 'Zeitungsartikel', data:[0,0,0,0,0,0,0,0,0,0,0,0]},
-                        {name: 'Gesamt', data:[0,0,0,0,0,0,0,0,0,0,0,0]}
+                        {name: 'Polizei', color: colorPolizei, data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Feuerwehr', color: colorFeuerwehr, data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Zeitungsartikel', color: colorZeitung, data:[0,0,0,0,0,0,0,0,0,0,0,0]},
+                        {name: 'Gesamt', color: colorGesamt, data:[0,0,0,0,0,0,0,0,0,0,0,0]}
                     ];
                     for (var i= 0; i < data.length; i++){
                         //serie raussuchen
@@ -323,9 +329,9 @@ exports.getStatistic = function (callback) {
             .then(function (data) {
                 statistic.reportsArticleTime = {};
                 var series = [
-                    {name: 'Polizei', data:[]},
-                    {name: 'Feuerwehr', data:[]},
-                    {name: 'Zeitungsartikel', data:[]}
+                    {name: 'Polizei', color: colorPolizei, data:[]},
+                    {name: 'Feuerwehr',color:colorFeuerwehr, data:[]},
+                    {name: 'Zeitungsartikel',color: colorZeitung, data:[]}
                 ];
                 for (var i = 0; i <data.length; i ++){
                     for (var k = 0; k<series.length; k++){
