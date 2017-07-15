@@ -64,6 +64,10 @@ function initializeMap() {
     var googleSearchBox = new google.maps.places.SearchBox(document.getElementById('search'));
 
     //using instead of boundce_change, also fired on startup of the map
+
+
+    //noinspection JSUnresolvedVariable
+
     google.maps.event.addListener(googleMap, 'idle', function() {
         loadMarkers(addMarkers);
     });
@@ -408,8 +412,21 @@ function getModalInfoContent(data, typ){
 //Source: https://stackoverflow.com/questions/2890670/google-maps-place-number-in-marker
 var generateIconCache = {};
 function generateLargeIconNumber(number, callback) {
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    var isIE = window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./);
+
+    if (isFirefox || isIE){
+        var icon = {
+            url: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=" + number + "|2063C6|000000",
+            scaledSize: new google.maps.Size(48, 48) // pixels
+        };
+        callback(icon);
+        return;
+    }
+
     if (generateIconCache[number] !== undefined) {
         callback(generateIconCache[number]);
+        return;
     }
 
     var fontSize = 16,
